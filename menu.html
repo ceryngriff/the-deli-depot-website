@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>This Week's Menu | Meal Prep | The Deli Depot</title>
+  <meta name="description" content="Weekly meal prep menu. Macro-tracked, heat-in-90-seconds healthy meals for collection from The Deli Depot, Merthyr Tydfil." />
+
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/meal-prep.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand" aria-label="The Deli Depot home">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+      </a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="primary-nav" class="nav__links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="menu.html" class="nav__link--active" style="color: var(--gold);">Meal Prep</a>
+        <a href="build-your-own.html">Build Your Own</a>
+        <button class="basket-counter" aria-label="Shopping basket with 0 items">
+          <span>Basket</span>
+          <span class="basket-counter__badge">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="meal-hero" aria-labelledby="hero-title">
+      <p class="meal-hero__accent">This Week's Menu</p>
+      <h1 id="hero-title" class="meal-hero__title">Fresh, Prepped, Fuelled</h1>
+      <p class="meal-hero__meta">
+        <span id="week-of">Week of 25 May</span>
+        <span>Order by 5pm for next-day collection</span>
+        <span>Collect from Pant Industrial Estate</span>
+      </p>
+    </section>
+
+    <!-- Filters Toggle (Mobile) -->
+    <div class="container">
+      <button class="meal-filters-toggle" aria-label="Toggle filters">
+        <span>⚙️ Filters</span>
+      </button>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="container">
+      <div class="meal-layout">
+        <!-- Sidebar Filters -->
+        <aside class="meal-layout__sidebar">
+          <div class="meal-filters">
+            <button class="meal-filters__close" aria-label="Close filters">×</button>
+
+            <!-- Sort -->
+            <div class="filter-group">
+              <label for="sort-select" class="filter-group__title">Sort by</label>
+              <select id="sort-select" class="filter-select">
+                <option value="popular">Most Popular</option>
+                <option value="protein-high">Highest Protein</option>
+                <option value="calorie-low">Lowest Calorie</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="new">New This Week</option>
+              </select>
+            </div>
+
+            <!-- Dietary -->
+            <div class="filter-group">
+              <label class="filter-group__title">Dietary & Macros</label>
+              <label class="filter-option">
+                <input type="checkbox" name="dietary" value="high-protein" />
+                <span>High Protein</span>
+                <span class="filter-option__count">(0)</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="dietary" value="low-carb" />
+                <span>Low Carb</span>
+                <span class="filter-option__count">(0)</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="dietary" value="under-500-kcal" />
+                <span>Under 500 kcal</span>
+                <span class="filter-option__count">(0)</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="dietary" value="vegetarian" />
+                <span>Vegetarian</span>
+                <span class="filter-option__count">(0)</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="dietary" value="gluten-free" />
+                <span>Gluten Free</span>
+                <span class="filter-option__count">(0)</span>
+              </label>
+            </div>
+
+            <!-- Protein Source -->
+            <div class="filter-group">
+              <label class="filter-group__title">Protein Source</label>
+              <label class="filter-option">
+                <input type="checkbox" name="protein" value="chicken" />
+                <span>Chicken</span>
+                <span class="filter-option__count">(0)</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="protein" value="beef" />
+                <span>Beef</span>
+                <span class="filter-option__count">(0)</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="protein" value="salmon" />
+                <span>Salmon</span>
+                <span class="filter-option__count">(0)</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="protein" value="plant-based" />
+                <span>Plant-Based</span>
+                <span class="filter-option__count">(0)</span>
+              </label>
+            </div>
+
+            <!-- Goal -->
+            <div class="filter-group">
+              <label class="filter-group__title">Goal</label>
+              <label class="filter-option">
+                <input type="checkbox" name="goal" value="lean" />
+                <span>Lean</span>
+                <span class="filter-option__count">(0)</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="goal" value="bulk" />
+                <span>Bulk</span>
+                <span class="filter-option__count">(0)</span>
+              </label>
+              <label class="filter-option">
+                <input type="checkbox" name="goal" value="maintenance" />
+                <span>Maintenance</span>
+                <span class="filter-option__count">(0)</span>
+              </label>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Meal Grid -->
+        <div class="meal-layout__main">
+          <div id="meal-grid" class="meal-grid">
+            <p style="grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 2rem;">Loading menu...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subscribe & Save CTA -->
+    <section class="subscribe-block" style="margin-top: clamp(4rem, 8vw, 6rem); margin-bottom: clamp(3rem, 6vw, 5rem);">
+      <p class="subscribe-block__accent">Subscribe & Save</p>
+      <h2 class="subscribe-block__title">Get 10% Off Weekly Orders</h2>
+      <p class="subscribe-block__desc">Subscribe to your favourite meals and never miss a delivery. Cancel anytime.</p>
+      <button class="btn" style="margin-top: 1rem;">Coming Soon</button>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <span class="brand brand--small">
+            <span class="brand__deli">DELI</span>
+            <span class="brand__depot">Depot</span>
+          </span>
+          <p>Fresh food, proper nutrition, made with care in Merthyr Tydfil.</p>
+        </div>
+        <div>
+          <h4>Meal Prep</h4>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li><a href="menu.html">Weekly Menu</a></li>
+            <li><a href="build-your-own.html">Build Your Own</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Hours</h4>
+          <p>Mon–Fri: 8am–3pm<br />Sat: 9am–2pm<br />Sun: Closed</p>
+        </div>
+        <div class="footer__brand" style="text-align: right;">
+          <h4>Location</h4>
+          <address>
+            Unit 5<br />Pant Industrial Estate<br />Merthyr Tydfil<br />CF48 2SR
+          </address>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; <span id="year"></span> The Deli Depot. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/basket.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

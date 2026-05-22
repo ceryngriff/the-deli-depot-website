@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meal Product | Meal Prep | The Deli Depot</title>
+  <meta name="description" content="Macro-tracked meal prep with premium ingredients, ready to collect from The Deli Depot." />
+
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/meal-prep.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand" aria-label="The Deli Depot home">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+      </a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="primary-nav" class="nav__links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="menu.html" class="nav__link--active" style="color: var(--gold);">Meal Prep</a>
+        <a href="build-your-own.html">Build Your Own</a>
+        <button class="basket-counter" aria-label="Shopping basket with 0 items">
+          <span>Basket</span>
+          <span class="basket-counter__badge">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="container">
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb">
+        <a href="menu.html">Menu</a>
+        <span>/</span>
+        <span>Meal</span>
+      </nav>
+
+      <!-- Product Layout -->
+      <article class="product-layout">
+        <!-- Images -->
+        <div class="product-images">
+          <div class="product-image-main">
+            <img src="" alt="Meal image" loading="lazy" />
+          </div>
+          <div class="product-images-thumbs">
+            <div class="product-images-thumb is-placeholder">Thumbnail 1</div>
+            <div class="product-images-thumb is-placeholder">Thumbnail 2</div>
+            <div class="product-images-thumb is-placeholder">Thumbnail 3</div>
+            <div class="product-images-thumb is-placeholder">Thumbnail 4</div>
+          </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="product-info">
+          <p class="product-info__accent">Signature</p>
+          <h1 class="product-info__title">Meal Name</h1>
+          <p class="product-info__tagline">Tagline goes here</p>
+          <p class="product-info__description">Description text</p>
+
+          <!-- Macros -->
+          <div>
+            <h3 class="h4">Macros per meal</h3>
+            <div class="product-macros">
+              <div>
+                <span class="product-macros__label">Calories</span>
+                <p class="product-macros__value">485</p>
+              </div>
+              <div>
+                <span class="product-macros__label">Protein</span>
+                <p class="product-macros__value">52g</p>
+              </div>
+              <div>
+                <span class="product-macros__label">Carbs</span>
+                <p class="product-macros__value">38g</p>
+              </div>
+              <div>
+                <span class="product-macros__label">Fat</span>
+                <p class="product-macros__value">12g</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bundle Selection -->
+          <div>
+            <h3 class="h4">Choose your bundle</h3>
+            <div class="bundle-selector"></div>
+          </div>
+
+          <!-- Quantity -->
+          <div>
+            <h3 class="h4" style="margin-bottom: 0.8rem;">Quantity</h3>
+            <div class="quantity-stepper">
+              <button aria-label="Decrease quantity">−</button>
+              <input type="number" value="1" min="1" readonly />
+              <button aria-label="Increase quantity">+</button>
+            </div>
+          </div>
+
+          <!-- Add to Basket -->
+          <button class="add-to-basket-btn">Add to Basket — £7.50</button>
+
+          <!-- Subscribe Hint -->
+          <div class="subscribe-hint">
+            💡 <strong>Subscribe & Save:</strong> Get 10% off when you order weekly.
+          </div>
+
+          <!-- Accordion -->
+          <div class="accordion">
+            <div class="accordion-item">
+              <button class="accordion-trigger" type="button" data-accordion="ingredients">
+                Ingredients & Allergens
+              </button>
+              <div class="accordion-content">
+                <div class="accordion-content__inner">
+                  Loading...
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger" type="button" data-accordion="heat">
+                Heat & Eat
+              </button>
+              <div class="accordion-content">
+                <div class="accordion-content__inner">
+                  Loading...
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger" type="button" data-accordion="collection">
+                Collection from The Deli Depot
+              </button>
+              <div class="accordion-content">
+                <div class="accordion-content__inner">
+                  Loading...
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <button class="accordion-trigger" type="button" data-accordion="storage">
+                Storage
+              </button>
+              <div class="accordion-content">
+                <div class="accordion-content__inner">
+                  Loading...
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <span class="brand brand--small">
+            <span class="brand__deli">DELI</span>
+            <span class="brand__depot">Depot</span>
+          </span>
+          <p>Fresh food, proper nutrition, made with care in Merthyr Tydfil.</p>
+        </div>
+        <div>
+          <h4>Meal Prep</h4>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li><a href="menu.html">Weekly Menu</a></li>
+            <li><a href="build-your-own.html">Build Your Own</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Hours</h4>
+          <p>Mon–Fri: 8am–3pm<br />Sat: 9am–2pm<br />Sun: Closed</p>
+        </div>
+        <div class="footer__brand" style="text-align: right;">
+          <h4>Location</h4>
+          <address>
+            Unit 5<br />Pant Industrial Estate<br />Merthyr Tydfil<br />CF48 2SR
+          </address>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; <span id="year"></span> The Deli Depot. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/basket.js"></script>
+  <script src="js/meal.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

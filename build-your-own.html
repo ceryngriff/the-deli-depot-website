@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Build Your Own Meal | The Deli Depot</title>
+  <meta name="description" content="Design your own macro-tracked meal. Choose protein, carbs, vegetables and sauce. Fresh ingredients, heated in 90 seconds." />
+
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/meal-prep.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand" aria-label="The Deli Depot home">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+      </a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="primary-nav" class="nav__links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="menu.html">Meal Prep</a>
+        <a href="build-your-own.html" class="nav__link--active" style="color: var(--gold);">Build Your Own</a>
+        <button class="basket-counter" aria-label="Shopping basket with 0 items">
+          <span>Basket</span>
+          <span class="basket-counter__badge">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="meal-hero" aria-labelledby="hero-title">
+      <p class="meal-hero__accent">Your Meal, Your Macros</p>
+      <h1 id="hero-title" class="meal-hero__title">Build Your Own</h1>
+    </section>
+
+    <div class="container">
+      <div class="builder-layout">
+        <!-- Builder Steps -->
+        <div class="builder-steps">
+          <!-- Step 1: Protein -->
+          <div class="builder-step">
+            <h2 class="builder-step__title">
+              <span class="builder-step__number">1</span>
+              Choose Your Protein
+            </h2>
+            <div class="builder-options" id="step-1-options">
+              <p style="grid-column: 1 / -1; color: var(--muted); text-align: center;">Loading proteins...</p>
+            </div>
+          </div>
+
+          <!-- Step 2: Carbs -->
+          <div class="builder-step">
+            <h2 class="builder-step__title">
+              <span class="builder-step__number">2</span>
+              Choose Your Carb Base
+            </h2>
+            <div class="builder-options" id="step-2-options">
+              <p style="grid-column: 1 / -1; color: var(--muted); text-align: center;">Loading carbs...</p>
+            </div>
+          </div>
+
+          <!-- Step 3: Veg -->
+          <div class="builder-step">
+            <h2 class="builder-step__title">
+              <span class="builder-step__number">3</span>
+              Choose Your Vegetables (Pick 2)
+            </h2>
+            <div class="builder-options" id="step-3-options">
+              <p style="grid-column: 1 / -1; color: var(--muted); text-align: center;">Loading vegetables...</p>
+            </div>
+          </div>
+
+          <!-- Step 4: Sauce -->
+          <div class="builder-step">
+            <h2 class="builder-step__title">
+              <span class="builder-step__number">4</span>
+              Choose Your Sauce
+            </h2>
+            <div class="builder-options" id="step-4-options">
+              <p style="grid-column: 1 / -1; color: var(--muted); text-align: center;">Loading sauces...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Card (Sticky) -->
+        <div class="builder-summary">
+          <h2 class="builder-summary__title">Your Meal</h2>
+          <div class="builder-summary__items">
+            <p style="color: var(--muted); margin: 0; text-align: center;">Select items to build your meal...</p>
+          </div>
+
+          <!-- Macros -->
+          <div class="builder-summary__macros">
+            <div class="builder-summary__macro">
+              <span class="builder-summary__macro-value">0</span>
+              <span class="builder-summary__macro-label">Kcal</span>
+            </div>
+            <div class="builder-summary__macro">
+              <span class="builder-summary__macro-value">0g</span>
+              <span class="builder-summary__macro-label">Protein</span>
+            </div>
+            <div class="builder-summary__macro">
+              <span class="builder-summary__macro-value">0g</span>
+              <span class="builder-summary__macro-label">Carbs</span>
+            </div>
+            <div class="builder-summary__macro">
+              <span class="builder-summary__macro-value">0g</span>
+              <span class="builder-summary__macro-label">Fat</span>
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div class="builder-summary__price">
+            <span>Total:</span>
+            <span class="builder-summary__price-value">£0.00</span>
+          </div>
+
+          <!-- Add Button -->
+          <button class="builder-summary__add-btn" disabled>
+            Add to Basket
+          </button>
+
+          <!-- Subscribe Hint -->
+          <p style="font-size: 0.85rem; color: var(--muted); text-align: center; margin: 1rem 0 0;">
+            💡 Subscribe & save 10%
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <span class="brand brand--small">
+            <span class="brand__deli">DELI</span>
+            <span class="brand__depot">Depot</span>
+          </span>
+          <p>Fresh food, proper nutrition, made with care in Merthyr Tydfil.</p>
+        </div>
+        <div>
+          <h4>Meal Prep</h4>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li><a href="menu.html">Weekly Menu</a></li>
+            <li><a href="build-your-own.html">Build Your Own</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Hours</h4>
+          <p>Mon–Fri: 8am–3pm<br />Sat: 9am–2pm<br />Sun: Closed</p>
+        </div>
+        <div class="footer__brand" style="text-align: right;">
+          <h4>Location</h4>
+          <address>
+            Unit 5<br />Pant Industrial Estate<br />Merthyr Tydfil<br />CF48 2SR
+          </address>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; <span id="year"></span> The Deli Depot. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/basket.js"></script>
+  <script src="js/builder.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

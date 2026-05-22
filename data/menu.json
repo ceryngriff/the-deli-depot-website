@@ -1,0 +1,141 @@
+[
+  {
+    "category": "sandwiches",
+    "name": "The Depot Classic",
+    "description": "Fresh ham, mature cheddar, tomato, crisp lettuce, home-made chutney on sourdough.",
+    "tag": "Signature",
+    "image": "assets/images/the-depot-classic.png"
+  },
+  {
+    "category": "sandwiches",
+    "name": "Welsh Rarebit Baguette",
+    "description": "Caerphilly & mustard rarebit, spring onion, grilled on a crusty baguette.",
+    "image": "assets/images/rarebit.png"
+  },
+  {
+    "category": "sandwiches",
+    "name": "Chicken & Pesto",
+    "description": "Roast chicken, basil pesto, rocket, sun-blush tomato on ciabatta.",
+    "image": "assets/images/chicken-pesto.png"
+  },
+  {
+    "category": "sandwiches",
+    "name": "BLT",
+    "description": "Streaky bacon, baby gem, tomato, proper mayo on toasted bloomer.",
+    "image": "assets/images/blt.png"
+  },
+  {
+    "category": "sandwiches",
+    "name": "Veggie Hummus Wrap",
+    "description": "Roasted veg, hummus, feta, mixed leaves in a soft wrap.",
+    "tag": "Veggie",
+    "image": "assets/images/hummus-wrap.png"
+  },
+  {
+    "category": "sandwiches",
+    "name": "Brie & Cranberry",
+    "description": "Creamy brie, tangy cranberry sauce, peppery rocket on a soft ciabatta. Christmas in a sandwich, all year round.",
+    "image": "assets/images/brie-cranberry.png"
+  },
+  {
+    "category": "sandwiches",
+    "name": "Steak & Onion Baguette",
+    "description": "Tender sliced steak, sweet caramelised onions, melted cheese and horseradish mayo in a crusty baguette.",
+    "image": "assets/images/steak-onion.png"
+  },
+
+  {
+    "category": "salad-bar",
+    "name": "Build Your Own (Small)",
+    "description": "Pick any 4 toppings, any 2 proteins. Dressing on the side.",
+    "tag": "Self-serve"
+  },
+  {
+    "category": "salad-bar",
+    "name": "Build Your Own (Large)",
+    "description": "Pick any 6 toppings, any 3 proteins. Load it up."
+  },
+
+  {
+    "category": "hot-food",
+    "name": "Soup of the Day",
+    "description": "Fresh daily. Ask in store. Served with a warm roll & butter.",
+    "tag": "Changes daily",
+    "image": "assets/images/soup-of-the-day.png"
+  },
+  {
+    "category": "hot-food",
+    "name": "Fully Loaded Jacket Potato",
+    "description": "Crisp-skin jacket piled high with melted cheddar, crispy bacon bits, sour cream and fresh chives.",
+    "tag": "Loaded",
+    "image": "assets/images/loaded-jacket-potato.png"
+  },
+  {
+    "category": "hot-food",
+    "name": "Curry of the Day",
+    "description": "Home-made curry, basmati rice, warm naan."
+  },
+  {
+    "category": "hot-food",
+    "name": "Pie & Peas",
+    "description": "Local pie, mushy peas, proper gravy."
+  },
+  {
+    "category": "hot-food",
+    "name": "Welsh Cawl",
+    "description": "Traditional Welsh lamb stew, slow-cooked with leeks, potatoes and root veg. Served with crusty bread and a wedge of Welsh cheese.",
+    "tag": "Welsh",
+    "image": "assets/images/cawl.png"
+  },
+
+  {
+    "category": "deli-counter",
+    "name": "Fresh Pasta & Sauces",
+    "description": "Hand-made pasta, pesto, fresh pasta sauce. Tonight's dinner sorted."
+  },
+
+  {
+    "category": "drinks",
+    "name": "Freshly Ground Coffee",
+    "description": "Flat white, latte, cappuccino, americano, mocha. Oat, almond or soya available.",
+    "image": "assets/images/coffee.png"
+  },
+  {
+    "category": "drinks",
+    "name": "Cold Pressed Juice",
+    "description": "Rotating flavours. Ask what's fresh today."
+  },
+  {
+    "category": "drinks",
+    "name": "Soft Drinks & Water",
+    "description": "Bottled & canned, including Welsh spring water."
+  },
+
+  {
+    "category": "sweet-treats",
+    "name": "Oreo Brownies",
+    "description": "Thick, fudgy chocolate brownies loaded with chunks of Oreo cookie. Rich, gooey and proper indulgent.",
+    "image": "assets/images/oreo-brownies.png"
+  },
+  {
+    "category": "sweet-treats",
+    "name": "Bara Brith",
+    "description": "Welsh fruit loaf, buttered. Proper.",
+    "tag": "Welsh",
+    "image": "assets/images/bara-brith.png"
+  },
+  {
+    "category": "sweet-treats",
+    "name": "White Chocolate Welsh Cakes",
+    "description": "Griddled Welsh cakes filled with white chocolate buttercream — sugar-dusted, soft and buttery.",
+    "tag": "Welsh",
+    "image": "assets/images/white-chocolate-welsh-cakes.png"
+  },
+  {
+    "category": "pots",
+    "name": "Depot Pots",
+    "description": "Grab-and-go pots — yogurt & granola, fresh fruit, or high-protein. Made fresh in store, perfect for breakfast or a quick lunch.",
+    "tag": "Fresh daily",
+    "image": "assets/images/depot-pots.png"
+  }
+]
