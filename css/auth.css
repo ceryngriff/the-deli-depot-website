@@ -1,0 +1,216 @@
+/* =========================================================
+   AUTH / LOGIN STYLES
+   Used by login.html (and later, signed-in account UIs that
+   share button/form patterns).
+   ========================================================= */
+
+.auth-wrap {
+  padding: clamp(2rem, 5vw, 4rem) 0 clamp(4rem, 8vw, 6rem);
+  display: flex;
+  justify-content: center;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  box-shadow: var(--shadow);
+}
+
+/* ---------- Tabs ---------- */
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin-bottom: 1.8rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.auth-tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--cream-muted);
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 1rem 0.5rem;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  margin-bottom: -1px;
+}
+
+.auth-tab:hover,
+.auth-tab:focus-visible {
+  color: var(--cream);
+}
+
+.auth-tab.is-active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+/* ---------- Message banner ---------- */
+.auth-message {
+  margin-bottom: 1.2rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  border: 1px solid var(--line);
+}
+
+.auth-message--info {
+  background: var(--gold-soft);
+  border-color: rgba(201, 169, 97, 0.3);
+  color: var(--cream);
+}
+
+.auth-message--success {
+  background: rgba(90, 138, 58, 0.12);
+  border-color: rgba(90, 138, 58, 0.4);
+  color: #b6d399;
+}
+
+.auth-message--error {
+  background: rgba(198, 61, 47, 0.12);
+  border-color: rgba(198, 61, 47, 0.4);
+  color: #f4b3a8;
+}
+
+/* ---------- Form ---------- */
+.auth-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.auth-field > span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.auth-field input {
+  background: var(--bg-deeper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.85rem 1rem;
+  color: var(--cream);
+  font-family: var(--sans);
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.auth-field input::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.auth-field input:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 1rem;
+  font-size: 0.85rem;
+}
+
+.auth-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---------- Divider ---------- */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.8rem 0 1.4rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* ---------- Alternative method buttons ---------- */
+.auth-methods {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.auth-method-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  background: var(--bg-deeper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--cream);
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.auth-method-btn:hover:not(:disabled),
+.auth-method-btn:focus-visible:not(:disabled) {
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-1px);
+}
+
+.auth-method-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-method-icon {
+  font-size: 1rem;
+  color: var(--gold);
+}
+
+.auth-method-btn--google svg {
+  flex-shrink: 0;
+}
+
+/* ---------- Footer note inside card ---------- */
+.auth-card__footnote {
+  margin: 1.4rem 0 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.auth-card__footnote a {
+  color: var(--gold);
+}

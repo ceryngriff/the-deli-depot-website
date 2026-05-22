@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In | The Deli Depot</title>
+  <meta name="description" content="Sign in or create an account to order meal prep from The Deli Depot." />
+  <meta name="robots" content="noindex" />
+
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/meal-prep.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+
+  <!-- Supabase config (local dev: js/env.js; production: Netlify snippet injection sets window.SUPABASE_CONFIG before this 404s) -->
+  <script src="js/env.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand" aria-label="The Deli Depot home">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+      </a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="primary-nav" class="nav__links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="menu.html">Meal Prep</a>
+        <a href="build-your-own.html">Build Your Own</a>
+        <button class="basket-counter" aria-label="Shopping basket with 0 items">
+          <span>Basket</span>
+          <span class="basket-counter__badge">0</span>
+        </button>
+        <a href="login.html" class="btn btn--sm" data-account-button>Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="meal-hero" aria-labelledby="auth-title">
+      <p class="meal-hero__accent">Welcome</p>
+      <h1 id="auth-title" class="meal-hero__title">Your Deli Depot Account</h1>
+      <p class="meal-hero__meta">
+        <span>Track your orders</span>
+        <span>Faster checkout</span>
+        <span>Manage subscriptions</span>
+      </p>
+    </section>
+
+    <div class="container auth-wrap">
+      <div class="auth-card">
+
+        <!-- Tabs -->
+        <div class="auth-tabs" role="tablist" aria-label="Sign in or sign up">
+          <button class="auth-tab is-active" data-tab="signin" role="tab"
+                  aria-selected="true" aria-controls="panel-signin" id="tab-signin">
+            Sign In
+          </button>
+          <button class="auth-tab" data-tab="signup" role="tab"
+                  aria-selected="false" aria-controls="panel-signup" id="tab-signup">
+            Sign Up
+          </button>
+        </div>
+
+        <!-- Message banner (shown by login.js) -->
+        <div id="auth-message" class="auth-message" hidden role="status" aria-live="polite"></div>
+
+        <!-- SIGN IN PANEL -->
+        <div class="auth-panel" id="panel-signin" data-panel="signin"
+             role="tabpanel" aria-labelledby="tab-signin">
+          <form id="signin-form" class="auth-form" novalidate>
+            <label class="auth-field">
+              <span>Email</span>
+              <input type="email" name="email" required autocomplete="email"
+                     placeholder="you@example.com" />
+            </label>
+            <label class="auth-field">
+              <span>Password</span>
+              <input type="password" name="password" required
+                     autocomplete="current-password" placeholder="••••••••" />
+            </label>
+            <button type="submit" class="btn auth-submit">Sign In</button>
+          </form>
+
+          <div class="auth-divider"><span>or</span></div>
+
+          <div class="auth-methods">
+            <button type="button" class="auth-method-btn" data-magic-link>
+              <span class="auth-method-icon" aria-hidden="true">✉</span>
+              Email me a magic link
+            </button>
+            <button type="button" class="auth-method-btn auth-method-btn--google" data-google-signin>
+              <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+                <path d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.08-1.78 2.72v2.26h2.88c1.68-1.55 2.65-3.83 2.65-6.62z" fill="#4285F4"/>
+                <path d="M9 18c2.4 0 4.42-.8 5.9-2.17l-2.88-2.26c-.8.54-1.82.86-3.02.86-2.32 0-4.29-1.57-5-3.68H1.02v2.32A8.99 8.99 0 0 0 9 18z" fill="#34A853"/>
+                <path d="M4 10.75A5.4 5.4 0 0 1 3.72 9c0-.61.1-1.2.28-1.75V4.93H1.02A9 9 0 0 0 0 9c0 1.45.34 2.82.96 4.07L4 10.75z" fill="#FBBC05"/>
+                <path d="M9 3.58c1.32 0 2.5.45 3.43 1.34l2.57-2.57C13.42.89 11.4 0 9 0A8.99 8.99 0 0 0 1.02 4.93L4 7.25C4.71 5.15 6.68 3.58 9 3.58z" fill="#EA4335"/>
+              </svg>
+              Continue with Google
+            </button>
+          </div>
+
+          <p class="auth-card__footnote">
+            New here? <a href="#" onclick="document.getElementById('tab-signup').click(); return false;">Create an account</a>.
+          </p>
+        </div>
+
+        <!-- SIGN UP PANEL -->
+        <div class="auth-panel" id="panel-signup" data-panel="signup"
+             role="tabpanel" aria-labelledby="tab-signup" hidden>
+          <form id="signup-form" class="auth-form" novalidate>
+            <label class="auth-field">
+              <span>Full name</span>
+              <input type="text" name="fullName" required autocomplete="name"
+                     placeholder="Your name" />
+            </label>
+            <label class="auth-field">
+              <span>Email</span>
+              <input type="email" name="email" required autocomplete="email"
+                     placeholder="you@example.com" />
+            </label>
+            <label class="auth-field">
+              <span>Password</span>
+              <input type="password" name="password" required minlength="6"
+                     autocomplete="new-password" placeholder="At least 6 characters" />
+            </label>
+            <button type="submit" class="btn auth-submit">Create Account</button>
+          </form>
+
+          <div class="auth-divider"><span>or</span></div>
+
+          <div class="auth-methods">
+            <button type="button" class="auth-method-btn" data-magic-link>
+              <span class="auth-method-icon" aria-hidden="true">✉</span>
+              Sign up with a magic link
+            </button>
+            <button type="button" class="auth-method-btn auth-method-btn--google" data-google-signin>
+              <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+                <path d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.08-1.78 2.72v2.26h2.88c1.68-1.55 2.65-3.83 2.65-6.62z" fill="#4285F4"/>
+                <path d="M9 18c2.4 0 4.42-.8 5.9-2.17l-2.88-2.26c-.8.54-1.82.86-3.02.86-2.32 0-4.29-1.57-5-3.68H1.02v2.32A8.99 8.99 0 0 0 9 18z" fill="#34A853"/>
+                <path d="M4 10.75A5.4 5.4 0 0 1 3.72 9c0-.61.1-1.2.28-1.75V4.93H1.02A9 9 0 0 0 0 9c0 1.45.34 2.82.96 4.07L4 10.75z" fill="#FBBC05"/>
+                <path d="M9 3.58c1.32 0 2.5.45 3.43 1.34l2.57-2.57C13.42.89 11.4 0 9 0A8.99 8.99 0 0 0 1.02 4.93L4 7.25C4.71 5.15 6.68 3.58 9 3.58z" fill="#EA4335"/>
+              </svg>
+              Continue with Google
+            </button>
+          </div>
+
+          <p class="auth-card__footnote">
+            Already have an account? <a href="#" onclick="document.getElementById('tab-signin').click(); return false;">Sign in</a>.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <span class="brand brand--small">
+            <span class="brand__deli">DELI</span>
+            <span class="brand__depot">Depot</span>
+          </span>
+          <p>Fresh food, proper nutrition, made with care in Merthyr Tydfil.</p>
+        </div>
+        <div>
+          <h4>Meal Prep</h4>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li><a href="menu.html">Weekly Menu</a></li>
+            <li><a href="build-your-own.html">Build Your Own</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Hours</h4>
+          <p>Mon–Fri: 8am–3pm<br />Sat: 9am–2pm<br />Sun: Closed</p>
+        </div>
+        <div class="footer__brand" style="text-align: right;">
+          <h4>Location</h4>
+          <address>
+            Unit 5<br />Pant Industrial Estate<br />Merthyr Tydfil<br />CF48 2SR
+          </address>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; <span id="year"></span> The Deli Depot. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script src="js/basket.js"></script>
+  <script type="module" src="js/login.js"></script>
+  <script type="module" src="js/nav.js"></script>
+</body>
+</html>
