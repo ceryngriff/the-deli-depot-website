@@ -15,6 +15,7 @@ Desktop.ini
 .env
 .env.*
 !.env.example
+js/env.js
 
 # Node (if you add a build step later)
 node_modules/

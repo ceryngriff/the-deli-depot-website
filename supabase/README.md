@@ -48,7 +48,40 @@ The site needs these two values to talk to Supabase.
 
 **Note on safety:** the `anon` key is fine to put in your website's JavaScript — that's what it's designed for. Row Level Security (which the schema sets up) is what protects your data. The `service_role` key on the same page, however, is **never** to be put in client code; treat it like an admin password.
 
-You'll plug these values into the site in Phase 2 (next step). Keep them safe for now.
+### Where the keys go in the site
+
+Two places:
+
+**Locally (for testing on your laptop):**
+Open [`js/env.js`](../js/env.js) in this repo and paste your two values into the placeholders:
+
+```js
+window.SUPABASE_CONFIG = {
+  url: 'https://abcdefghij.supabase.co',   // ← your Project URL
+  anonKey: 'eyJhbGci...'                   // ← your anon/public key
+};
+```
+
+`js/env.js` is in `.gitignore`, so your keys never get committed. The committed [`js/env.example.js`](../js/env.example.js) is just a template to remind you of the shape — don't edit that one.
+
+**On Netlify (for the deployed site):**
+Because `js/env.js` is gitignored, it won't exist on Netlify. Use **Netlify snippet injection** to write the same config into every page at deploy time:
+
+1. In Netlify, open your site → **Site configuration** → **Build & deploy** → **Post processing** → **Snippet injection**.
+2. Click **Add snippet**.
+3. **Insert:** *Before `</head>`*.
+4. **Snippet body:** paste this, replacing the two values with your real ones:
+   ```html
+   <script>
+     window.SUPABASE_CONFIG = {
+       url: 'https://abcdefghij.supabase.co',
+       anonKey: 'eyJhbGci...'
+     };
+   </script>
+   ```
+5. **Save.** Trigger a redeploy (Deploys → Trigger deploy → Clear cache and deploy site) so the snippet takes effect.
+
+That's it. The deployed pages will have `SUPABASE_CONFIG` set inline in `<head>`, before any of the app's `<script>` tags run. The browser will log a harmless 404 for `js/env.js` (because it's gitignored), which the site is built to tolerate.
 
 ---
 
