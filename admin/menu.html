@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Menu | Admin | The Deli Depot</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/account.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+
+  <script src="../js/env.js"></script>
+</head>
+<body class="admin">
+
+  <div class="admin-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" aria-label="Admin navigation">
+      <a href="/admin/index.html" class="admin-sidebar__brand">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+        <span class="admin-sidebar__label">Admin</span>
+      </a>
+      <nav class="admin-nav" aria-label="Sections">
+        <a href="/admin/index.html">Dashboard</a>
+        <a href="/admin/menu.html" class="is-active">Menu</a>
+        <a href="/admin/orders.html">
+          Orders <span class="admin-nav__badge" data-pending-count hidden>0</span>
+        </a>
+        <a href="/admin/subscriptions.html">Subscriptions</a>
+        <a href="/admin/reports.html">Reports</a>
+      </nav>
+      <div class="admin-sidebar__bottom">
+        <nav class="admin-nav" aria-label="Account">
+          <a href="/index.html">Back to Site</a>
+          <a href="#" data-sign-out>Sign Out</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="admin-main">
+
+      <header class="admin-topbar">
+        <button class="admin-topbar__toggle" data-sidebar-toggle aria-label="Open menu">☰</button>
+        <h1 class="admin-topbar__title">Manage Menu</h1>
+        <span class="admin-topbar__greeting">Hi, <span data-admin-greeting>Admin</span></span>
+      </header>
+
+      <main class="admin-content">
+
+        <!-- Toolbar -->
+        <div class="admin-toolbar">
+          <input type="search" id="search-input" class="admin-toolbar__search"
+                 placeholder="Search by name or slug…" autocomplete="off" />
+          <select id="category-filter" class="admin-toolbar__select" aria-label="Filter by category">
+            <option value="">All categories</option>
+            <option value="signature">Signature</option>
+            <option value="breakfast">Breakfast</option>
+            <option value="add-on">Add-on</option>
+          </select>
+          <select id="status-filter" class="admin-toolbar__select" aria-label="Filter by status">
+            <option value="">All statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="new">New this week</option>
+          </select>
+          <button id="add-meal-btn" class="btn">+ New Meal</button>
+        </div>
+
+        <!-- Bulk actions -->
+        <div class="admin-bulk">
+          <span class="admin-bulk__label">Bulk:</span>
+          <button id="bulk-activate-btn" class="btn btn--outline">Set all to active</button>
+          <button id="bulk-clear-new-btn" class="btn btn--outline">Clear all "new this week"</button>
+        </div>
+
+        <!-- Table -->
+        <div class="admin-table-wrap">
+          <div class="admin-table-scroll">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Kcal</th>
+                  <th>Price</th>
+                  <th>Active</th>
+                  <th>New</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="meals-tbody">
+                <tr><td colspan="8" class="admin-table__empty">Loading meals…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="meals-count" class="admin-footer-count"></div>
+        </div>
+
+      </main>
+
+    </div>
+  </div>
+
+  <!-- ===== MEAL EDIT MODAL ===== -->
+  <dialog id="meal-modal" class="admin-modal" aria-labelledby="meal-modal-title">
+    <div class="admin-modal__inner">
+
+      <header class="admin-modal__header">
+        <h2 id="meal-modal-title" class="admin-modal__title">New Meal</h2>
+        <button type="button" id="meal-modal-close" class="admin-modal__close" aria-label="Close">&times;</button>
+      </header>
+
+      <div class="admin-modal__body">
+        <form id="meal-form" class="admin-form" novalidate>
+
+          <div class="admin-form__row">
+            <label class="admin-field">
+              <span>Slug</span>
+              <input type="text" name="slug" required placeholder="powerhouse" pattern="[a-z0-9-]+" />
+              <span class="admin-field__hint">Lowercase, hyphens only. Used in URLs — don't change later.</span>
+            </label>
+            <label class="admin-field">
+              <span>Name</span>
+              <input type="text" name="name" required placeholder="The Powerhouse" />
+            </label>
+          </div>
+
+          <label class="admin-field">
+            <span>Tagline</span>
+            <input type="text" name="tagline" placeholder="Piri Piri Chicken · Basmati · Tenderstem" />
+          </label>
+
+          <div class="admin-form__row">
+            <label class="admin-field">
+              <span>Category</span>
+              <select name="category">
+                <option value="signature">Signature</option>
+                <option value="breakfast">Breakfast</option>
+                <option value="add-on">Add-on</option>
+              </select>
+            </label>
+            <label class="admin-field">
+              <span>Sort order</span>
+              <input type="number" name="sort_order" step="10" placeholder="10" />
+              <span class="admin-field__hint">Lower numbers show first on the customer menu.</span>
+            </label>
+          </div>
+
+          <label class="admin-field">
+            <span>Description</span>
+            <textarea name="description" rows="3" placeholder="Marinated chicken over basmati…"></textarea>
+          </label>
+
+          <label class="admin-field">
+            <span>Image</span>
+            <div class="image-uploader">
+              <div id="image-preview" class="image-uploader__preview">Preview</div>
+              <div class="image-uploader__controls">
+                <input type="text" name="image_url" id="image-url" placeholder="https://…  or  assets/meals/powerhouse.jpg" />
+                <input type="file" id="image-file" accept="image/*" />
+                <span class="image-uploader__hint">Upload a new image OR paste a URL. Uploaded files go to the meal-images bucket.</span>
+              </div>
+            </div>
+          </label>
+
+          <h3 style="margin: 1.5rem 0 0; font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold);">Macros (per meal)</h3>
+          <div class="admin-form__row admin-form__row--four">
+            <label class="admin-field"><span>Kcal</span><input type="number" name="kcal" /></label>
+            <label class="admin-field"><span>Protein (g)</span><input type="number" name="protein_g" /></label>
+            <label class="admin-field"><span>Carbs (g)</span><input type="number" name="carbs_g" /></label>
+            <label class="admin-field"><span>Fat (g)</span><input type="number" name="fat_g" /></label>
+          </div>
+
+          <h3 style="margin: 1.5rem 0 0; font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold);">Prices</h3>
+          <div class="admin-form__row admin-form__row--four">
+            <label class="admin-field"><span>Single (£)</span><input type="number" name="price_single" step="0.01" /></label>
+            <label class="admin-field"><span>5-Pack (£)</span><input type="number" name="price_bundle_5" step="0.01" /></label>
+            <label class="admin-field"><span>10-Pack (£)</span><input type="number" name="price_bundle_10" step="0.01" /></label>
+            <div></div>
+          </div>
+
+          <h3 style="margin: 1.5rem 0 0; font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold);">Tags &amp; Targeting</h3>
+          <div class="admin-form__row">
+            <label class="admin-field">
+              <span>Tags</span>
+              <input type="text" name="tags" placeholder="high-protein, gluten-free, lean" />
+              <span class="admin-field__hint">Comma-separated. Drives customer filters.</span>
+            </label>
+            <label class="admin-field">
+              <span>Protein source</span>
+              <input type="text" name="protein_source" placeholder="chicken / beef / salmon / plant-based" list="protein-source-options" />
+              <datalist id="protein-source-options">
+                <option value="chicken"></option>
+                <option value="beef"></option>
+                <option value="salmon"></option>
+                <option value="turkey"></option>
+                <option value="tofu"></option>
+                <option value="plant-based"></option>
+              </datalist>
+            </label>
+          </div>
+          <label class="admin-field">
+            <span>Goal tags</span>
+            <input type="text" name="goal_tags" placeholder="lean, bulk, maintenance" />
+            <span class="admin-field__hint">Comma-separated.</span>
+          </label>
+
+          <h3 style="margin: 1.5rem 0 0; font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold);">Ingredients &amp; Allergens</h3>
+          <label class="admin-field">
+            <span>Ingredients</span>
+            <textarea name="ingredients" rows="3" placeholder="Chicken breast, basmati rice, …"></textarea>
+          </label>
+          <div class="admin-form__row">
+            <label class="admin-field">
+              <span>Allergens contains</span>
+              <input type="text" name="allergens_contains" placeholder="dairy, mustard, sesame" />
+              <span class="admin-field__hint">Comma-separated.</span>
+            </label>
+            <label class="admin-field">
+              <span>Allergens may contain</span>
+              <input type="text" name="allergens_may_contain" placeholder="gluten, nuts" />
+              <span class="admin-field__hint">Cross-contamination risks. Comma-separated.</span>
+            </label>
+          </div>
+
+          <h3 style="margin: 1.5rem 0 0; font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold);">Heat &amp; Storage</h3>
+          <label class="admin-field">
+            <span>Heat instructions</span>
+            <textarea name="heat_instructions" rows="2" placeholder="Microwave 90 seconds…"></textarea>
+          </label>
+          <label class="admin-field">
+            <span>Storage</span>
+            <input type="text" name="storage" placeholder="Keep refrigerated below 5°C. Best within 4 days." />
+          </label>
+
+          <div class="admin-checkbox-row">
+            <label>
+              <input type="checkbox" name="is_active" />
+              Active (visible to customers)
+            </label>
+            <label>
+              <input type="checkbox" name="new_this_week" />
+              "New this week" badge
+            </label>
+          </div>
+
+        </form>
+      </div>
+
+      <footer class="admin-modal__footer">
+        <button type="button" id="meal-modal-delete" class="btn btn--danger" hidden>Delete</button>
+        <div class="admin-modal__footer-spacer"></div>
+        <button type="button" id="meal-modal-cancel" class="btn btn--outline">Cancel</button>
+        <button type="submit" id="meal-modal-save" class="btn" form="meal-form">Save</button>
+      </footer>
+
+    </div>
+  </dialog>
+
+  <script type="module" src="../js/admin-menu.js"></script>
+</body>
+</html>
