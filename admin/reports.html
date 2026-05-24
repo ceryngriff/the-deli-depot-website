@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reports | Admin | The Deli Depot</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/account.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+
+  <script src="../js/env.js"></script>
+</head>
+<body class="admin">
+
+  <div class="admin-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" aria-label="Admin navigation">
+      <a href="/admin/index.html" class="admin-sidebar__brand">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+        <span class="admin-sidebar__label">Admin</span>
+      </a>
+      <nav class="admin-nav" aria-label="Sections">
+        <a href="/admin/index.html">Dashboard</a>
+        <a href="/admin/menu.html">Menu</a>
+        <a href="/admin/orders.html">
+          Orders <span class="admin-nav__badge" data-pending-count hidden>0</span>
+        </a>
+        <a href="/admin/subscriptions.html">Subscriptions</a>
+        <a href="/admin/reports.html" class="is-active">Reports</a>
+      </nav>
+      <div class="admin-sidebar__bottom">
+        <nav class="admin-nav" aria-label="Account">
+          <a href="/index.html">Back to Site</a>
+          <a href="#" data-sign-out>Sign Out</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="admin-main">
+
+      <header class="admin-topbar">
+        <button class="admin-topbar__toggle" data-sidebar-toggle aria-label="Open menu">☰</button>
+        <h1 class="admin-topbar__title">Reports</h1>
+        <span class="admin-topbar__greeting">Hi, <span data-admin-greeting>Admin</span></span>
+      </header>
+
+      <main class="admin-content">
+
+        <!-- Date range controls -->
+        <div class="report-range">
+          <div class="report-range__presets">
+            <button class="btn btn--outline" data-preset="today">Today</button>
+            <button class="btn btn--outline" data-preset="week">This Week</button>
+            <button class="btn btn--outline" data-preset="month">This Month</button>
+            <button class="btn btn--outline" data-preset="last30">Last 30 Days</button>
+          </div>
+          <div class="report-range__spacer"></div>
+          <div class="report-range__inputs">
+            <label class="report-range__field">
+              <span>From</span>
+              <input type="date" id="from-input" />
+            </label>
+            <label class="report-range__field">
+              <span>To</span>
+              <input type="date" id="to-input" />
+            </label>
+            <button id="apply-range-btn" class="btn">Apply</button>
+            <button id="export-csv-btn" class="btn btn--outline">Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Top metric cards -->
+        <section class="dash-grid" aria-label="Key metrics for the date range">
+          <div class="dash-card">
+            <span class="dash-card__label">Revenue</span>
+            <span class="dash-card__value" id="m-revenue">—</span>
+            <span class="dash-card__hint">excluding cancelled</span>
+          </div>
+          <div class="dash-card">
+            <span class="dash-card__label">Orders</span>
+            <span class="dash-card__value" id="m-orders">—</span>
+            <span class="dash-card__hint">in range</span>
+          </div>
+          <div class="dash-card">
+            <span class="dash-card__label">Avg Order Value</span>
+            <span class="dash-card__value" id="m-avg">—</span>
+            <span class="dash-card__hint">revenue / orders</span>
+          </div>
+          <div class="dash-card">
+            <span class="dash-card__label">Active Subscriptions</span>
+            <span class="dash-card__value" id="m-subs">—</span>
+            <span class="dash-card__hint">all-time, current</span>
+          </div>
+        </section>
+
+        <!-- Revenue chart + status breakdown -->
+        <div class="report-charts">
+          <section class="report-section">
+            <h2>Daily Revenue</h2>
+            <div class="chart-canvas-wrap">
+              <canvas id="revenue-chart"></canvas>
+            </div>
+          </section>
+          <section class="report-section">
+            <h2>Order Status</h2>
+            <div class="chart-canvas-wrap">
+              <canvas id="status-chart"></canvas>
+            </div>
+          </section>
+        </div>
+
+        <!-- Top meals -->
+        <section class="report-section">
+          <h2>Top 10 Meals</h2>
+          <div id="top-meals">
+            <p class="admin-table__empty">Loading…</p>
+          </div>
+        </section>
+
+        <!-- Customer breakdown -->
+        <section class="report-section">
+          <h2>Customers</h2>
+          <div id="customer-breakdown" class="report-customer-grid">
+            <p class="admin-table__empty" style="grid-column: 1 / -1;">Loading…</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="../js/admin-reports.js"></script>
+</body>
+</html>

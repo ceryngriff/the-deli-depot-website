@@ -804,3 +804,113 @@ body.admin-login { background: var(--bg-deeper); }
   gap: 0.6rem;
   flex-wrap: wrap;
 }
+
+/* =========================================================
+   REPORTS PAGE
+   ========================================================= */
+.report-range {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: end;
+}
+.report-range__presets {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.report-range__presets .btn {
+  font-size: 0.72rem;
+  padding: 0.5rem 0.9rem;
+}
+.report-range__inputs {
+  display: flex;
+  gap: 0.6rem;
+  align-items: end;
+  flex-wrap: wrap;
+}
+.report-range__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.report-range__field span {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.report-range__field input {
+  background: var(--bg-deeper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.55rem 0.7rem;
+  color: var(--cream);
+  font-family: var(--sans);
+  font-size: 0.9rem;
+}
+.report-range__spacer { flex: 1; }
+
+.report-section {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem;
+  margin-bottom: 1.5rem;
+}
+.report-section h2 {
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 1rem;
+  font-weight: 600;
+}
+
+.report-charts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 980px) {
+  .report-charts { grid-template-columns: 2fr 1fr; }
+}
+
+.chart-canvas-wrap {
+  position: relative;
+  height: 280px;
+}
+@media (max-width: 600px) {
+  .chart-canvas-wrap { height: 220px; }
+}
+
+.report-customer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+.report-customer-tile {
+  background: var(--bg-deeper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+}
+.report-customer-tile__label {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 0.4rem;
+  font-weight: 600;
+}
+.report-customer-tile__value {
+  font-size: 1.6rem;
+  color: var(--cream);
+  font-weight: 600;
+}
