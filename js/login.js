@@ -13,12 +13,20 @@ import {
 
 // ---------- HELPERS ----------
 
+function defaultRedirectTarget() {
+  // When sign-in happens at /admin/login.html, default landing
+  // is the admin dashboard; otherwise the customer account page.
+  return window.location.pathname.includes('/admin/')
+    ? '/admin/index.html'
+    : 'account.html';
+}
+
 function getRedirectTarget() {
   const params = new URLSearchParams(window.location.search);
   const raw = params.get('redirect');
-  if (!raw) return 'account.html';
-  // Only allow same-origin relative paths to prevent open redirects.
-  if (/^https?:/i.test(raw) || raw.startsWith('//')) return 'account.html';
+  if (!raw) return defaultRedirectTarget();
+  // Block off-site redirects (open-redirect protection).
+  if (/^https?:/i.test(raw) || raw.startsWith('//')) return defaultRedirectTarget();
   return raw;
 }
 

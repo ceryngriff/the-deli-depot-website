@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staff Sign In | The Deli Depot</title>
+  <meta name="description" content="Staff sign-in for The Deli Depot admin dashboard." />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/meal-prep.css" />
+  <link rel="stylesheet" href="../css/auth.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+
+  <script src="../js/env.js"></script>
+</head>
+<body class="admin-login">
+  <main>
+    <section class="meal-hero" aria-labelledby="auth-title">
+      <p class="meal-hero__accent">Staff Only</p>
+      <h1 id="auth-title" class="meal-hero__title">Admin Sign In</h1>
+      <p class="meal-hero__meta">
+        <span>Manage menu, orders, subscriptions</span>
+      </p>
+    </section>
+
+    <div class="container auth-wrap">
+      <div class="auth-card">
+
+        <!-- No Sign Up tab — staff accounts are created by promoting an
+             existing customer to role='admin' in Supabase. -->
+        <div class="auth-tabs" role="tablist" aria-label="Sign in">
+          <button class="auth-tab is-active" data-tab="signin" role="tab" aria-selected="true">Sign In</button>
+        </div>
+
+        <div id="auth-message" class="auth-message" hidden role="status" aria-live="polite"></div>
+
+        <div class="auth-panel" data-panel="signin" role="tabpanel">
+          <form id="signin-form" class="auth-form" novalidate>
+            <label class="auth-field">
+              <span>Email</span>
+              <input type="email" name="email" required autocomplete="email"
+                     placeholder="you@example.com" />
+            </label>
+            <label class="auth-field">
+              <span>Password</span>
+              <input type="password" name="password" required
+                     autocomplete="current-password" placeholder="••••••••" />
+            </label>
+            <button type="submit" class="btn auth-submit">Sign In</button>
+          </form>
+
+          <div class="auth-divider"><span>or</span></div>
+
+          <div class="auth-methods">
+            <button type="button" class="auth-method-btn" data-magic-link>
+              <span class="auth-method-icon" aria-hidden="true">✉</span>
+              Email me a magic link
+            </button>
+          </div>
+
+          <p class="auth-card__footnote">
+            Not a staff member? <a href="../login.html">Customer sign-in</a>.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="../js/login.js"></script>
+</body>
+</html>

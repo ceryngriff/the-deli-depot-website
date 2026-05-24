@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | The Deli Depot</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/account.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+
+  <script src="../js/env.js"></script>
+</head>
+<body class="admin">
+
+  <div class="admin-shell">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="admin-sidebar" aria-label="Admin navigation">
+      <a href="/admin/index.html" class="admin-sidebar__brand">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+        <span class="admin-sidebar__label">Admin</span>
+      </a>
+
+      <nav class="admin-nav" aria-label="Sections">
+        <a href="/admin/index.html" class="is-active">Dashboard</a>
+        <a href="/admin/menu.html">Menu</a>
+        <a href="/admin/orders.html">
+          Orders <span class="admin-nav__badge" data-pending-count hidden>0</span>
+        </a>
+        <a href="/admin/subscriptions.html">Subscriptions</a>
+        <a href="/admin/reports.html">Reports</a>
+      </nav>
+
+      <div class="admin-sidebar__bottom">
+        <nav class="admin-nav" aria-label="Account">
+          <a href="/index.html">Back to Site</a>
+          <a href="#" data-sign-out>Sign Out</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN ===== -->
+    <div class="admin-main">
+
+      <header class="admin-topbar">
+        <button class="admin-topbar__toggle" data-sidebar-toggle aria-label="Open menu">☰</button>
+        <h1 class="admin-topbar__title">Dashboard</h1>
+        <span class="admin-topbar__greeting">Hi, <span data-admin-greeting>Admin</span></span>
+      </header>
+
+      <main class="admin-content">
+
+        <!-- ===== METRIC CARDS ===== -->
+        <section class="dash-grid" aria-label="Key metrics">
+
+          <a class="dash-card dash-card--clickable" href="/admin/orders.html?status=pending">
+            <span class="dash-card__label">Pending Orders</span>
+            <span class="dash-card__value" id="metric-pending">—</span>
+            <span class="dash-card__hint">click to manage</span>
+          </a>
+
+          <a class="dash-card dash-card--clickable" href="/admin/orders.html?date=today">
+            <span class="dash-card__label">Orders Today</span>
+            <span class="dash-card__value" id="metric-today">—</span>
+            <span class="dash-card__hint">collection slots</span>
+          </a>
+
+          <div class="dash-card">
+            <span class="dash-card__label">Revenue (7 days)</span>
+            <span class="dash-card__value" id="metric-revenue">—</span>
+            <span class="dash-card__hint">excluding cancelled</span>
+          </div>
+
+          <a class="dash-card dash-card--clickable" href="/admin/subscriptions.html">
+            <span class="dash-card__label">Active Subscriptions</span>
+            <span class="dash-card__value" id="metric-subs">—</span>
+            <span class="dash-card__hint">all customers</span>
+          </a>
+
+          <div class="dash-card">
+            <span class="dash-card__label">New Customers (7 days)</span>
+            <span class="dash-card__value" id="metric-new-customers">—</span>
+            <span class="dash-card__hint">signed up this week</span>
+          </div>
+
+        </section>
+
+        <!-- ===== TODAY'S COLLECTIONS ===== -->
+        <h2 class="dash-section-title">Today's Collections</h2>
+        <section id="todays-collections" aria-label="Today's collections">
+          <p class="dash-empty">Loading…</p>
+        </section>
+
+      </main>
+
+    </div>
+  </div>
+
+  <script type="module" src="../js/admin-dashboard.js"></script>
+</body>
+</html>

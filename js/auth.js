@@ -126,15 +126,16 @@ export async function requireAuth({ redirectTo = 'login.html' } = {}) {
 }
 
 // Use on admin pages. Returns { session, profile, denied }.
-//  - Not signed in -> redirects to admin/login.html.
+//  - Not signed in -> redirects to /admin/login.html (absolute so it
+//    works regardless of how deeply nested the calling page is).
 //  - Signed in but not admin -> resolves with denied=true so the page
 //    can render an "Access denied" view instead of a hard redirect.
-export async function requireAdmin({ loginUrl = 'admin/login.html' } = {}) {
+export async function requireAdmin({ loginUrl = '/admin/login.html' } = {}) {
   const session = await getSession();
   if (!session) {
-    const current = encodeURIComponent(
-      window.location.pathname.split('/').slice(-2).join('/') + window.location.search
-    );
+    // Use an absolute path for the redirect target so the login page
+    // can navigate back regardless of its own URL.
+    const current = encodeURIComponent(window.location.pathname + window.location.search);
     window.location.replace(`${loginUrl}?redirect=${current}`);
     return null;
   }

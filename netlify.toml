@@ -28,3 +28,15 @@
   for = "/data/*"
   [headers.values]
     Cache-Control = "public, max-age=3600"
+
+# Block search engines from caching admin pages
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+# Clean /admin URL → admin index
+[[redirects]]
+  from = "/admin"
+  to = "/admin/index.html"
+  status = 200

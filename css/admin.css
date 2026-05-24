@@ -1,0 +1,311 @@
+/* =========================================================
+   ADMIN — layout, sidebar, dashboard cards
+   ========================================================= */
+
+body.admin {
+  /* Slightly denser, functional feel — content area is full width */
+  background: var(--bg-deeper);
+}
+
+.admin-shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+@media (max-width: 880px) {
+  .admin-shell { grid-template-columns: 1fr; }
+}
+
+/* ---------- Sidebar ---------- */
+.admin-sidebar {
+  background: var(--bg);
+  border-right: 1px solid var(--line);
+  padding: 1.5rem 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 880px) {
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 100;
+    box-shadow: var(--shadow);
+  }
+  .admin-sidebar.is-open { transform: translateX(0); }
+}
+
+.admin-sidebar__brand {
+  padding: 0 1.5rem 1.5rem;
+  border-bottom: 1px solid var(--line);
+  display: block;
+  text-align: center;
+}
+.admin-sidebar__brand .brand__deli { font-size: 0.62rem; letter-spacing: 0.4em; }
+.admin-sidebar__brand .brand__depot { font-size: 1.8rem; margin-top: -0.2em; }
+.admin-sidebar__label {
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: block;
+  margin-top: 0.4rem;
+}
+
+.admin-nav {
+  padding: 1.2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.admin-nav a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  color: var(--cream-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-left: 3px solid transparent;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.admin-nav a:hover,
+.admin-nav a:focus-visible {
+  background: var(--gold-soft);
+  color: var(--cream);
+}
+.admin-nav a.is-active {
+  background: var(--gold-soft);
+  color: var(--gold);
+  border-left-color: var(--gold);
+}
+
+.admin-nav__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  background: var(--gold);
+  color: var(--bg);
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.admin-sidebar__bottom {
+  margin-top: auto;
+  padding: 1.2rem 0 0.5rem;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+/* ---------- Main area ---------- */
+.admin-main {
+  padding: 0;
+  min-width: 0;
+}
+
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem clamp(1rem, 3vw, 2rem);
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  gap: 1rem;
+}
+.admin-topbar__title {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--cream);
+  margin: 0;
+}
+.admin-topbar__greeting { color: var(--cream-muted); font-size: 0.85rem; }
+
+.admin-topbar__toggle {
+  display: none;
+  width: 40px; height: 40px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--cream);
+  cursor: pointer;
+}
+@media (max-width: 880px) {
+  .admin-topbar__toggle { display: grid; place-items: center; }
+}
+
+.admin-content {
+  padding: clamp(1.2rem, 3vw, 2rem);
+}
+
+/* ---------- Dashboard cards ---------- */
+.dash-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-bottom: 2rem;
+}
+
+.dash-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-decoration: none;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.dash-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+.dash-card--clickable { cursor: pointer; }
+.dash-card__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.dash-card__value {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--cream);
+}
+.dash-card__hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* ---------- Today's collections ---------- */
+.dash-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--cream);
+  margin: 1.5rem 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.dash-section-title::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.dash-empty {
+  color: var(--cream-muted);
+  text-align: center;
+  padding: 2rem 1rem;
+  background: var(--bg);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+}
+
+.collections-group {
+  margin-bottom: 1.5rem;
+}
+.collections-group__title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.collections-group__count {
+  background: var(--gold-soft);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  padding: 0.15rem 0.6rem;
+  border-radius: 100px;
+  font-size: 0.7rem;
+}
+.collections-group__list {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.collection-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.collection-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+.collection-card__time {
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.collection-card__name { color: var(--cream); margin: 0; }
+.collection-card__meta { color: var(--muted); font-size: 0.85rem; margin: 0; }
+.collection-card__actions {
+  margin-top: 0.4rem;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.collection-card__actions .btn { padding: 0.5rem 0.9rem; font-size: 0.72rem; }
+
+/* Reuse status badges from account.css if it's loaded; safe duplicate here so admin works alone. */
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.status-pending    { color: var(--gold);  border-color: var(--gold);  background: var(--gold-soft); }
+.status-confirmed  { color: #9cb8df;      border-color: rgba(156,184,223,0.4); background: rgba(156,184,223,0.1); }
+.status-preparing  { color: #d9a06c;      border-color: rgba(217,160,108,0.4); background: rgba(217,160,108,0.12); }
+.status-ready      { color: #b6d399;      border-color: rgba(182,211,153,0.5); background: rgba(90,138,58,0.15); }
+.status-collected  { color: var(--muted); border-color: var(--line);     background: transparent; }
+.status-cancelled  { color: #f4b3a8;      border-color: rgba(244,179,168,0.4); background: rgba(198,61,47,0.12); }
+.status-active     { color: #b6d399;      border-color: rgba(182,211,153,0.5); background: rgba(90,138,58,0.15); }
+.status-paused     { color: #d9a06c;      border-color: rgba(217,160,108,0.4); background: rgba(217,160,108,0.12); }
+
+/* ---------- Admin login (uses the customer auth.css but body backdrop is darker) ---------- */
+body.admin-login {
+  background: var(--bg-deeper);
+}
