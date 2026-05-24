@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout | The Deli Depot</title>
+  <meta name="description" content="Confirm collection details and place your meal-prep order." />
+  <meta name="robots" content="noindex" />
+
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/meal-prep.css" />
+  <link rel="stylesheet" href="css/checkout.css" />
+
+  <script src="js/env.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand" aria-label="The Deli Depot home">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+      </a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="primary-nav" class="nav__links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="menu.html">Meal Prep</a>
+        <a href="build-your-own.html">Build Your Own</a>
+        <button class="basket-counter" aria-label="Shopping basket">
+          <span>Basket</span>
+          <span class="basket-counter__badge">0</span>
+        </button>
+        <a href="login.html" class="btn btn--sm" data-account-button>Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="meal-hero" aria-labelledby="checkout-title">
+      <p class="meal-hero__accent">Almost There</p>
+      <h1 id="checkout-title" class="meal-hero__title">Checkout</h1>
+    </section>
+
+    <div class="container cart-page">
+      <div class="cart-layout">
+        <form id="checkout-form" novalidate>
+
+          <!-- Guest sign-in nudge (shown when not signed in) -->
+          <div id="guest-banner" class="guest-banner" hidden>
+            <p><strong>Sign in for faster checkout</strong> — saves your details and lets you track this order in your account.</p>
+            <div class="guest-banner__actions">
+              <a class="btn btn--sm" href="login.html?redirect=checkout.html" data-guest-signin>Sign In</a>
+              <span style="font-size: 0.85rem; color: var(--cream-muted);">or just fill the form below</span>
+            </div>
+          </div>
+
+          <!-- Contact details -->
+          <div class="checkout-card">
+            <h2 class="cart-section-title">Your Details</h2>
+            <label class="checkout-field">
+              <span>Full Name</span>
+              <input type="text" name="fullName" required autocomplete="name" />
+            </label>
+            <div class="checkout-field--row">
+              <label class="checkout-field">
+                <span>Email</span>
+                <input type="email" name="email" required autocomplete="email" />
+              </label>
+              <label class="checkout-field">
+                <span>Phone</span>
+                <input type="tel" name="phone" required autocomplete="tel" />
+              </label>
+            </div>
+          </div>
+
+          <!-- Collection slot -->
+          <div class="checkout-card">
+            <h2 class="cart-section-title">Collection Slot</h2>
+            <p style="margin: 0 0 1rem; font-size: 0.9rem; color: var(--cream-muted);">
+              Order by 5pm for next-day collection. Closed Sundays.
+            </p>
+            <div class="checkout-field--row">
+              <label class="checkout-field">
+                <span>Date</span>
+                <input type="date" name="collectionDate" id="collection-date" required />
+              </label>
+              <label class="checkout-field">
+                <span>Time</span>
+                <select name="collectionTime" id="collection-time" required></select>
+              </label>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="checkout-card">
+            <h2 class="cart-section-title">Order Notes</h2>
+            <label class="checkout-field">
+              <span>Anything we should know? (optional)</span>
+              <textarea name="notes" rows="3" placeholder="Allergies, collection preferences, etc."></textarea>
+            </label>
+          </div>
+
+          <p id="checkout-error" class="error-text" hidden role="alert"></p>
+
+        </form>
+
+        <!-- Order summary card -->
+        <aside class="summary-card" aria-labelledby="summary-title">
+          <h2 id="summary-title" class="cart-section-title">Order Summary</h2>
+          <ul id="summary-items" class="confirmation-items" style="margin: 0 0 1rem;"></ul>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="summary-subtotal" class="summary-row__value">£0.00</span>
+          </div>
+          <div class="summary-row summary-row--total">
+            <span>Total</span>
+            <span id="summary-total" class="summary-row__value">£0.00</span>
+          </div>
+          <button id="place-order-btn" type="submit" form="checkout-form" class="btn">Place Order</button>
+          <p class="summary-card__note">
+            No payment now — pay in person on collection. We'll have your meals ready for the slot you pick.
+          </p>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__bottom">
+        <p>&copy; <span id="year"></span> The Deli Depot. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script src="js/basket.js"></script>
+  <script type="module" src="js/checkout.js"></script>
+  <script type="module" src="js/nav.js"></script>
+</body>
+</html>

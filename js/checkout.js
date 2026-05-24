@@ -1,0 +1,292 @@
+// =========================================================
+// CHECKOUT
+// Collection slot picker + contact form + order creation.
+// Supports both signed-in users and guest checkout.
+//
+// TODO: Stripe integration — when payments go live, add a
+// "Pay now" step between order insert and confirmation.
+// =========================================================
+
+import { supabase } from './supabase.js';
+import { getSession, getCurrentProfile } from './auth.js';
+
+const basket = window.MealPrepBasket;
+
+// ---------- DEFAULT TIME SLOTS ----------
+// Spec gave 8am / 12pm / 5pm / 7pm. Deli closes at 15:00 weekdays,
+// so the late slots assume meal-prep collections run outside trading
+// hours — Ceryn can adjust this list to suit.
+const TIME_SLOTS = [
+  { value: '08:00', label: '8:00 AM' },
+  { value: '12:00', label: '12:00 PM' },
+  { value: '17:00', label: '5:00 PM' },
+  { value: '19:00', label: '7:00 PM' }
+];
+
+// ---------- COLLECTION DATE LOGIC ----------
+
+const CUTOFF_HOUR = 17; // 5pm
+
+// Returns the earliest collection date (YYYY-MM-DD) given current time.
+// Rule: order by 5pm for next-day collection. After 5pm → day after tomorrow.
+// Skip Sundays (deli is closed).
+function getEarliestCollectionDate() {
+  const now = new Date();
+  let earliest = new Date(now);
+  earliest.setHours(0, 0, 0, 0);
+  if (now.getHours() >= CUTOFF_HOUR) earliest.setDate(earliest.getDate() + 2);
+  else earliest.setDate(earliest.getDate() + 1);
+  while (earliest.getDay() === 0) earliest.setDate(earliest.getDate() + 1);
+  return earliest;
+}
+
+function toISODate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function combineDateTime(dateStr, timeStr) {
+  // Build a Date in the user's local zone, then convert to ISO for the DB.
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const [hh, mm] = timeStr.split(':').map(Number);
+  return new Date(y, m - 1, d, hh, mm, 0, 0);
+}
+
+// ---------- BUNDLE MAPPING ----------
+
+function toBundleType(b) {
+  switch (b) {
+    case 'single':         return 'single';
+    case '5':
+    case 'bundle_5':       return 'bundle_5';
+    case '10':
+    case 'bundle_10':      return 'bundle_10';
+    case 'custom':
+    case 'build_your_own': return 'build_your_own';
+    default:               return 'single';
+  }
+}
+
+// ---------- FORM HELPERS ----------
+
+function showError(msg) {
+  const box = document.getElementById('checkout-error');
+  if (!box) return;
+  box.textContent = msg;
+  box.hidden = false;
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function hideError() {
+  const box = document.getElementById('checkout-error');
+  if (box) box.hidden = true;
+}
+
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+// ---------- RENDER ORDER SUMMARY ----------
+
+function renderSummary() {
+  const list = document.getElementById('summary-items');
+  const subEl = document.getElementById('summary-subtotal');
+  const totEl = document.getElementById('summary-total');
+  if (!list) return;
+
+  const items = basket.getBasket();
+  if (items.length === 0) {
+    // Redirect back if the basket got emptied
+    window.location.replace('basket.html');
+    return;
+  }
+
+  list.innerHTML = items.map((item) => `
+    <li>
+      <span>${escapeHtml(item.name)} <small style="color: var(--muted);">×${item.quantity}</small></span>
+      <strong>£${(item.price * item.quantity).toFixed(2)}</strong>
+    </li>
+  `).join('');
+
+  const sub = basket.getBasketTotal();
+  if (subEl) subEl.textContent = `£${sub.toFixed(2)}`;
+  if (totEl) totEl.textContent = `£${sub.toFixed(2)}`;
+}
+
+// ---------- PRE-FILL CONTACT FIELDS ----------
+
+async function prefillContact() {
+  const session = await getSession();
+  const guestBanner = document.getElementById('guest-banner');
+
+  if (!session) {
+    if (guestBanner) guestBanner.hidden = false;
+    // Add ?redirect=checkout.html to the sign-in link
+    document.querySelectorAll('[data-guest-signin]').forEach((a) => {
+      a.setAttribute('href', 'login.html?redirect=checkout.html');
+    });
+    return;
+  }
+
+  // Signed in — pre-fill from profile
+  if (guestBanner) guestBanner.hidden = true;
+  const profile = await getCurrentProfile();
+  const form = document.getElementById('checkout-form');
+  if (!form || !profile) return;
+
+  if (form.fullName  && !form.fullName.value)  form.fullName.value  = profile.full_name || '';
+  if (form.email     && !form.email.value)     form.email.value     = profile.email || session.user.email || '';
+  if (form.phone     && !form.phone.value)     form.phone.value     = profile.phone || '';
+}
+
+// ---------- SETUP DATE PICKER ----------
+
+function setupDatePicker() {
+  const dateInput = document.getElementById('collection-date');
+  const timeSelect = document.getElementById('collection-time');
+  if (!dateInput || !timeSelect) return;
+
+  const earliest = getEarliestCollectionDate();
+  dateInput.min = toISODate(earliest);
+  dateInput.value = toISODate(earliest);
+
+  // Populate time slots
+  timeSelect.innerHTML = TIME_SLOTS
+    .map((s) => `<option value="${s.value}">${escapeHtml(s.label)}</option>`)
+    .join('');
+
+  // Prevent Sunday selection (input type=date doesn't natively block weekdays).
+  dateInput.addEventListener('change', () => {
+    const chosen = new Date(dateInput.value);
+    if (chosen.getDay() === 0) {
+      // Bump to Monday
+      chosen.setDate(chosen.getDate() + 1);
+      dateInput.value = toISODate(chosen);
+      showError('Sunday is closed — moved your collection to Monday.');
+      setTimeout(hideError, 4000);
+    }
+  });
+}
+
+// ---------- PLACE ORDER ----------
+
+async function placeOrder() {
+  hideError();
+  const form = document.getElementById('checkout-form');
+  if (!form) return;
+
+  const items = basket.getBasket();
+  if (items.length === 0) {
+    showError('Your basket is empty.');
+    return;
+  }
+
+  const fullName = form.fullName.value.trim();
+  const email    = form.email.value.trim();
+  const phone    = form.phone.value.trim();
+  const notes    = form.notes.value.trim();
+  const date     = form.collectionDate.value;
+  const time     = form.collectionTime.value;
+
+  if (!fullName || !email || !phone || !date || !time) {
+    showError('Please fill in your name, email, phone, and collection slot.');
+    return;
+  }
+
+  const collectionDateTime = combineDateTime(date, time);
+  if (Number.isNaN(collectionDateTime.getTime())) {
+    showError('That collection date/time looks wrong. Please re-pick.');
+    return;
+  }
+
+  const subtotal = basket.getBasketTotal();
+  const session = await getSession();
+  const customerId = session?.user?.id || null;
+
+  const submitBtn = document.getElementById('place-order-btn');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Placing order…';
+  }
+
+  // 1. Insert the order
+  const { data: order, error: orderErr } = await supabase
+    .from('orders')
+    .insert({
+      customer_id:     customerId,
+      customer_email:  email,
+      customer_name:   fullName,
+      customer_phone:  phone,
+      status:          'pending',
+      collection_slot: collectionDateTime.toISOString(),
+      subtotal:        subtotal,
+      total:           subtotal,
+      notes:           notes || null,
+      payment_status:  'unpaid'
+    })
+    .select()
+    .single();
+
+  if (orderErr || !order) {
+    console.error('[checkout] order insert', orderErr);
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Place Order'; }
+    showError(`We couldn't place your order: ${orderErr?.message || 'Unknown error'}`);
+    return;
+  }
+
+  // 2. Insert order_items
+  const itemRows = items.map((item) => ({
+    order_id:      order.id,
+    meal_id:       item.meal_id || null,
+    meal_name:     item.name,
+    bundle_type:   toBundleType(item.bundle),
+    quantity:      item.quantity,
+    unit_price:    parseFloat(item.price.toFixed(2)),
+    line_total:    parseFloat((item.price * item.quantity).toFixed(2)),
+    build_details: item.custom ? {
+      protein:        item.custom.protein,
+      proteinPortion: item.custom.proteinPortion,
+      carb:           item.custom.carb,
+      veg:            item.custom.veg,
+      sauce:          item.custom.sauce
+    } : null,
+    macros: item.macros || null
+  }));
+
+  const { error: itemsErr } = await supabase.from('order_items').insert(itemRows);
+
+  if (itemsErr) {
+    console.error('[checkout] items insert', itemsErr);
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Place Order'; }
+    showError(`Order placed but items failed to save. Order number: ${order.order_number}. Please tell the deli.`);
+    return;
+  }
+
+  // 3. Cache the order details so the confirmation page can show them
+  // even for guests (RLS won't let anon read their own orders back).
+  try {
+    sessionStorage.setItem('dd_last_order', JSON.stringify({
+      order,
+      items: itemRows,
+      cachedAt: new Date().toISOString()
+    }));
+  } catch (e) { /* sessionStorage might be unavailable */ }
+
+  // 4. Empty the basket and redirect
+  basket.clearBasket();
+  window.location.href = `order-confirmation.html?order=${encodeURIComponent(order.order_number)}`;
+}
+
+// ---------- INIT ----------
+
+document.getElementById('checkout-form')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+  placeOrder();
+});
+
+renderSummary();
+prefillContact();
+setupDatePicker();

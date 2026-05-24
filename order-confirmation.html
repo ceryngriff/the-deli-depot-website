@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Confirmed | The Deli Depot</title>
+  <meta name="description" content="Your meal-prep order is in. Collection details below." />
+  <meta name="robots" content="noindex" />
+
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/meal-prep.css" />
+  <link rel="stylesheet" href="css/checkout.css" />
+
+  <script src="js/env.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand" aria-label="The Deli Depot home">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+      </a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="primary-nav" class="nav__links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="menu.html">Meal Prep</a>
+        <a href="build-your-own.html">Build Your Own</a>
+        <button class="basket-counter" aria-label="Shopping basket">
+          <span>Basket</span>
+          <span class="basket-counter__badge">0</span>
+        </button>
+        <a href="login.html" class="btn btn--sm" data-account-button>Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="container cart-page">
+
+      <p id="confirmation-loading" style="text-align: center; color: var(--cream-muted); padding: 4rem 0;">
+        Loading your order…
+      </p>
+
+      <div id="confirmation-content" hidden>
+        <div class="confirmation-card">
+          <div class="confirmation-card__tick" aria-hidden="true">✓</div>
+          <h1 class="confirmation-card__title">Order Confirmed</h1>
+          <p class="confirmation-card__order-num" id="order-number">DD-2026-0001</p>
+
+          <p style="color: var(--cream-muted); margin: 0 0 1rem;">
+            Thanks <span id="order-customer">there</span> — we've got your order. Collect from <strong>Unit 5, Pant Industrial Estate, Merthyr Tydfil</strong> at the slot below.
+          </p>
+
+          <dl class="confirmation-meta">
+            <div>
+              <dt>Collection</dt>
+              <dd id="order-collection">—</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd id="order-status">Pending</dd>
+            </div>
+            <div>
+              <dt>Total</dt>
+              <dd id="order-total">£0.00</dd>
+            </div>
+            <div>
+              <dt>Payment</dt>
+              <dd>On collection</dd>
+            </div>
+          </dl>
+
+          <h2 class="cart-section-title" style="text-align: left;">Your Items</h2>
+          <ul id="order-items" class="confirmation-items"></ul>
+
+          <p style="font-size: 0.85rem; color: var(--muted); margin: 1.5rem 0 0;">
+            Save this page or screenshot the order number above. We'll have your meals ready for the slot you picked.
+          </p>
+
+          <div class="confirmation-actions">
+            <a class="btn" href="menu.html">Order Again</a>
+            <a class="btn btn--outline" href="account.html">View My Orders</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__bottom">
+        <p>&copy; <span id="year"></span> The Deli Depot. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script src="js/basket.js"></script>
+  <script type="module" src="js/order-confirmation.js"></script>
+  <script type="module" src="js/nav.js"></script>
+</body>
+</html>

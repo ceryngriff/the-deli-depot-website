@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Basket | The Deli Depot</title>
+  <meta name="description" content="Review your meal-prep basket before checkout." />
+  <meta name="robots" content="noindex" />
+
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/meal-prep.css" />
+  <link rel="stylesheet" href="css/checkout.css" />
+
+  <script src="js/env.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand" aria-label="The Deli Depot home">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+      </a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="primary-nav" class="nav__links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="menu.html">Meal Prep</a>
+        <a href="build-your-own.html">Build Your Own</a>
+        <button class="basket-counter" aria-label="Shopping basket">
+          <span>Basket</span>
+          <span class="basket-counter__badge">0</span>
+        </button>
+        <a href="login.html" class="btn btn--sm" data-account-button>Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="meal-hero" aria-labelledby="basket-title">
+      <p class="meal-hero__accent">Your Basket</p>
+      <h1 id="basket-title" class="meal-hero__title">Review &amp; Continue</h1>
+    </section>
+
+    <div class="container cart-page">
+
+      <!-- Empty state -->
+      <div id="basket-empty" class="basket-empty" style="display: none;">
+        <p>Your basket is empty.</p>
+        <a class="btn" href="menu.html">Browse the Menu</a>
+      </div>
+
+      <!-- Cart layout (items + summary) -->
+      <div id="cart-layout" class="cart-layout">
+        <div>
+          <h2 class="cart-section-title">Your Items</h2>
+          <div id="basket-list" class="basket-list"></div>
+
+          <div id="addon-strip" class="addon-strip">
+            <h3>Add These To Your Order</h3>
+            <div id="addon-grid" class="addon-strip__grid"></div>
+          </div>
+        </div>
+
+        <aside class="summary-card" aria-labelledby="summary-title">
+          <h2 id="summary-title" class="cart-section-title">Order Summary</h2>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="summary-subtotal" class="summary-row__value">£0.00</span>
+          </div>
+          <div class="summary-row summary-row--total">
+            <span>Total</span>
+            <span id="summary-total" class="summary-row__value">£0.00</span>
+          </div>
+          <button id="proceed-checkout" class="btn" disabled>Proceed to Checkout</button>
+          <p class="summary-card__note">
+            Payment is taken in person on collection at Pant Industrial Estate.
+          </p>
+        </aside>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__bottom">
+        <p>&copy; <span id="year"></span> The Deli Depot. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script src="js/basket.js"></script>
+  <script type="module" src="js/basket-page.js"></script>
+  <script type="module" src="js/nav.js"></script>
+</body>
+</html>

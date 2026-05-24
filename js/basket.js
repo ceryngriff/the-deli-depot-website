@@ -125,16 +125,23 @@ const MealPrepBasket = (() => {
   function updateBasketCounter() {
     const count = getBasketCount();
     const counters = document.querySelectorAll('.basket-counter');
-    
+
     counters.forEach(counter => {
       const badge = counter.querySelector('.basket-counter__badge');
-      
+
       if (badge) {
         badge.textContent = count;
       }
-      
-      // Update aria label for accessibility
+
       counter.setAttribute('aria-label', `Shopping basket with ${count} item${count !== 1 ? 's' : ''}`);
+
+      // Make the basket button navigate to basket.html (idempotent).
+      if (!counter.dataset.navWired) {
+        counter.dataset.navWired = '1';
+        counter.addEventListener('click', () => {
+          window.location.href = 'basket.html';
+        });
+      }
     });
   }
 
