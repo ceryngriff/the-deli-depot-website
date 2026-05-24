@@ -144,7 +144,7 @@ async function prefillContact() {
 
 // ---------- SETUP DATE PICKER ----------
 
-function setupDatePicker() {
+async function setupDatePicker() {
   const dateInput = document.getElementById('collection-date');
   const timeSelect = document.getElementById('collection-time');
   if (!dateInput || !timeSelect) return;
@@ -153,13 +153,10 @@ function setupDatePicker() {
   dateInput.min = toISODate(earliest);
   dateInput.value = toISODate(earliest);
 
-  // Populate time slots
-  timeSelect.innerHTML = TIME_SLOTS
-    .map((s) => `<option value="${s.value}">${escapeHtml(s.label)}</option>`)
-    .join('');
+  await refreshTimeSlots(dateInput.value);
 
   // Prevent Sunday selection (input type=date doesn't natively block weekdays).
-  dateInput.addEventListener('change', () => {
+  dateInput.addEventListener('change', async () => {
     const chosen = new Date(dateInput.value);
     if (chosen.getDay() === 0) {
       // Bump to Monday
@@ -168,7 +165,53 @@ function setupDatePicker() {
       showError('Sunday is closed — moved your collection to Monday.');
       setTimeout(hideError, 4000);
     }
+    await refreshTimeSlots(dateInput.value);
   });
+}
+
+// Query slot_availability RPC and render the time dropdown with
+// "X left" / "(full)" annotations. Slots that are full are disabled.
+async function refreshTimeSlots(dateStr) {
+  const timeSelect = document.getElementById('collection-time');
+  if (!timeSelect) return;
+  const prevValue = timeSelect.value;
+
+  const { data, error } = await supabase.rpc('slot_availability', { p_date: dateStr });
+  if (error) {
+    console.warn('[checkout] slot_availability', error);
+    // Fall back to plain slots so checkout still works if the RPC fails
+    timeSelect.innerHTML = TIME_SLOTS
+      .map((s) => `<option value="${s.value}">${escapeHtml(s.label)}</option>`)
+      .join('');
+    return;
+  }
+
+  const availMap = new Map((data || []).map((a) => [a.time_slot, a]));
+
+  timeSelect.innerHTML = TIME_SLOTS.map((s) => {
+    const a = availMap.get(s.value);
+    if (!a) {
+      // No cap configured for this slot — leave it open
+      return `<option value="${s.value}">${escapeHtml(s.label)}</option>`;
+    }
+    const remaining = Math.max(0, a.max_orders - a.used);
+    const full = remaining === 0;
+    const label = full
+      ? `${s.label} — full`
+      : `${s.label} — ${remaining} left`;
+    return `<option value="${s.value}" ${full ? 'disabled' : ''}>${escapeHtml(label)}</option>`;
+  }).join('');
+
+  // Restore previous selection if it's still valid; otherwise pick the
+  // first non-disabled option.
+  const stillValid = Array.from(timeSelect.options)
+    .find((o) => o.value === prevValue && !o.disabled);
+  if (stillValid) {
+    timeSelect.value = prevValue;
+  } else {
+    const firstOpen = Array.from(timeSelect.options).find((o) => !o.disabled);
+    if (firstOpen) timeSelect.value = firstOpen.value;
+  }
 }
 
 // ---------- PLACE ORDER ----------
@@ -199,6 +242,16 @@ async function placeOrder() {
   const collectionDateTime = combineDateTime(date, time);
   if (Number.isNaN(collectionDateTime.getTime())) {
     showError('That collection date/time looks wrong. Please re-pick.');
+    return;
+  }
+
+  // Re-check capacity at submit time (another customer could have filled
+  // this slot while we were on the page).
+  const { data: avail } = await supabase.rpc('slot_availability', { p_date: date });
+  const thisSlot = (avail || []).find((a) => a.time_slot === time);
+  if (thisSlot && thisSlot.used >= thisSlot.max_orders) {
+    showError('Sorry — that slot just filled up while you were checking out. Please pick another time.');
+    await refreshTimeSlots(date);
     return;
   }
 

@@ -210,6 +210,52 @@ create index if not exists audit_log_created_idx on public.audit_log (created_at
 
 
 -- =========================================================
+-- 7. SLOT CAPACITIES
+-- One row per (weekday, time-of-day) slot, with a configurable cap.
+-- Rows with no entry are treated as "no cap".
+-- =========================================================
+create table if not exists public.slot_capacities (
+  id          uuid primary key default gen_random_uuid(),
+  weekday     text not null check (weekday in
+                ('monday','tuesday','wednesday','thursday','friday','saturday','sunday')),
+  time_slot   text not null,
+  max_orders  int  not null default 20 check (max_orders >= 0),
+  created_at  timestamptz not null default now(),
+  unique (weekday, time_slot)
+);
+
+-- RPC consumed by checkout to render time-slot availability without
+-- exposing other order details. SECURITY DEFINER so it bypasses RLS.
+create or replace function public.slot_availability(p_date date)
+returns table(time_slot text, used int, max_orders int)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  with caps as (
+    select sc.time_slot, sc.max_orders
+    from public.slot_capacities sc
+    where sc.weekday = trim(lower(to_char(p_date, 'day')))
+  ),
+  used as (
+    select to_char(collection_slot, 'HH24:MI') as time_slot,
+           count(*)::int as cnt
+    from public.orders
+    where collection_slot::date = p_date
+      and status != 'cancelled'
+    group by to_char(collection_slot, 'HH24:MI')
+  )
+  select c.time_slot, coalesce(u.cnt, 0) as used, c.max_orders
+  from caps c
+  left join used u on u.time_slot = c.time_slot
+  order by c.time_slot;
+$$;
+
+grant execute on function public.slot_availability(date) to anon, authenticated;
+
+
+-- =========================================================
 -- updated_at trigger (shared by meals + orders)
 -- =========================================================
 create or replace function public.touch_updated_at()
@@ -236,12 +282,13 @@ create trigger orders_touch_updated
 -- =========================================================
 -- ROW LEVEL SECURITY
 -- =========================================================
-alter table public.profiles      enable row level security;
-alter table public.meals         enable row level security;
-alter table public.orders        enable row level security;
-alter table public.order_items   enable row level security;
-alter table public.subscriptions enable row level security;
-alter table public.audit_log     enable row level security;
+alter table public.profiles        enable row level security;
+alter table public.meals           enable row level security;
+alter table public.orders          enable row level security;
+alter table public.order_items     enable row level security;
+alter table public.subscriptions   enable row level security;
+alter table public.audit_log       enable row level security;
+alter table public.slot_capacities enable row level security;
 
 -- Drop any previous versions so this file can be re-run cleanly.
 drop policy if exists "profiles_self_read"     on public.profiles;
@@ -354,6 +401,26 @@ create policy "audit_admin_read"   on public.audit_log
 
 create policy "audit_admin_insert" on public.audit_log
   for insert with check (public.is_admin());
+
+-- -------- slot_capacities --------
+drop policy if exists "slot_caps_public_read" on public.slot_capacities;
+create policy "slot_caps_public_read"
+  on public.slot_capacities
+  for select using (true);
+
+drop policy if exists "slot_caps_admin_all" on public.slot_capacities;
+create policy "slot_caps_admin_all"
+  on public.slot_capacities
+  for all using (public.is_admin())
+  with check (public.is_admin());
+
+-- Seed default cap of 20 per slot.
+insert into public.slot_capacities (weekday, time_slot, max_orders)
+select w, t, 20
+from (values ('monday'),('tuesday'),('wednesday'),('thursday'),('friday'),('saturday'))
+       as wd(w)
+cross join (values ('08:00'),('12:00'),('17:00'),('19:00')) as ts(t)
+on conflict (weekday, time_slot) do nothing;
 
 
 -- =========================================================
