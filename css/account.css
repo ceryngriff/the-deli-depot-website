@@ -292,3 +292,77 @@
 .toast--success { border-left-color: #5a8a3a; }
 .toast--error { border-left-color: #c63d2f; }
 .toast--info { border-left-color: var(--gold); }
+
+/* ---------- Allergen warnings ---------- */
+.allergen-warning {
+  background: rgba(198, 61, 47, 0.1);
+  border: 1px solid rgba(198, 61, 47, 0.5);
+  border-left: 4px solid #c63d2f;
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  color: var(--cream);
+}
+.allergen-warning strong {
+  display: block;
+  color: #f4b3a8;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.4rem;
+}
+.allergen-warning p {
+  margin: 0.3rem 0;
+  color: var(--cream-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.allergen-warning__hint {
+  font-size: 0.78rem !important;
+  color: var(--muted) !important;
+  margin-top: 0.6rem !important;
+}
+.allergen-warning__hint a { color: var(--gold); }
+
+.allergen-warning--may {
+  background: rgba(217, 160, 108, 0.1);
+  border-color: rgba(217, 160, 108, 0.4);
+  border-left-color: #d9a06c;
+}
+.allergen-warning--may strong {
+  color: #d9a06c;
+}
+
+/* ---------- Allergen checkbox grid (account profile) ---------- */
+.allergen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem;
+  padding: 0.6rem 0 0;
+}
+.allergen-grid label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-deeper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--cream-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.allergen-grid label:hover {
+  border-color: var(--gold);
+  color: var(--cream);
+}
+.allergen-grid input:checked + span {
+  color: #f4b3a8;
+  font-weight: 600;
+}
+.allergen-grid label:has(input:checked) {
+  border-color: rgba(198, 61, 47, 0.6);
+  background: rgba(198, 61, 47, 0.08);
+}
+.allergen-grid input { accent-color: #c63d2f; }

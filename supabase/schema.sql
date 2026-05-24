@@ -18,6 +18,7 @@ create table if not exists public.profiles (
   phone       text,
   role        text not null default 'customer' check (role in ('customer','admin')),
   notes       text,
+  allergens   text[] not null default '{}',  -- customer-declared dietary allergens
   created_at  timestamptz not null default now()
 );
 

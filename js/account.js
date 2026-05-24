@@ -7,6 +7,7 @@
 import { supabase } from './supabase.js';
 import { requireAuth, getCurrentProfile, signOut } from './auth.js';
 import { toast } from './toast.js';
+import { ALLERGENS } from './allergens.js';
 
 const basket = window.MealPrepBasket;
 
@@ -278,15 +279,31 @@ function renderProfile(profile, user) {
   form.phone.value    = profile?.phone || '';
   // Email is managed by Supabase auth; show but disable for now
   form.email.disabled = true;
+
+  // Render allergen checkboxes
+  const grid = document.getElementById('allergen-grid');
+  if (grid) {
+    const have = new Set(profile?.allergens || []);
+    grid.innerHTML = ALLERGENS.map((a) => `
+      <label>
+        <input type="checkbox" name="allergen" value="${a.key}" ${have.has(a.key) ? 'checked' : ''} />
+        <span>${a.label}</span>
+      </label>
+    `).join('');
+  }
 }
 
 function setupProfileForm() {
   const form = document.getElementById('profile-form');
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const allergens = Array.from(
+      form.querySelectorAll('input[name="allergen"]:checked')
+    ).map((cb) => cb.value);
     const updates = {
       full_name: form.fullName.value.trim() || null,
-      phone:     form.phone.value.trim() || null
+      phone:     form.phone.value.trim() || null,
+      allergens: allergens
     };
     const { error } = await supabase
       .from('profiles')

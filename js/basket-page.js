@@ -5,6 +5,7 @@
 // =========================================================
 
 import { supabase } from './supabase.js';
+import { loadCustomerAllergens, checkMeal, buildWarningEl, labelFor } from './allergens.js';
 
 const basket = window.MealPrepBasket;
 
@@ -158,6 +159,67 @@ async function loadAddons() {
   });
 }
 
+// ---------- ALLERGEN WARNINGS ----------
+//
+// Cross-reference the basket's meals (by meal_id) against the
+// signed-in customer's declared allergens. Renders a single banner
+// above the basket list if anything in the basket conflicts.
+
+async function renderAllergenWarning() {
+  // Clear old banner first
+  document.querySelectorAll('.allergen-warning').forEach((el) => el.remove());
+
+  const customerAllergens = await loadCustomerAllergens();
+  if (customerAllergens.length === 0) return;
+
+  const items = basket.getBasket();
+  const mealIds = Array.from(new Set(items.map((i) => i.meal_id).filter(Boolean)));
+  if (mealIds.length === 0) return;
+
+  // Fetch allergens for each unique meal in the basket
+  const { data: meals } = await supabase
+    .from('meals')
+    .select('id, name, allergens_contains, allergens_may_contain')
+    .in('id', mealIds);
+  if (!meals) return;
+
+  const offenders = [];
+  const cautions = [];
+  meals.forEach((m) => {
+    const r = checkMeal(m, customerAllergens);
+    if (r.contains.length) {
+      offenders.push({ name: m.name, allergens: r.contains });
+    } else if (r.mayContain.length) {
+      cautions.push({ name: m.name, allergens: r.mayContain });
+    }
+  });
+
+  if (offenders.length === 0 && cautions.length === 0) return;
+
+  const div = document.createElement('div');
+  div.className = offenders.length ? 'allergen-warning' : 'allergen-warning allergen-warning--may';
+  let body = '';
+  if (offenders.length) {
+    body += `<p>${offenders.map((o) =>
+      `<strong style="color: #f4b3a8;">${escapeHtml(o.name)}</strong> contains ${o.allergens.map(labelFor).join(', ')}`
+    ).join(' · ')}.</p>`;
+  }
+  if (cautions.length) {
+    body += `<p>${cautions.map((c) =>
+      `<strong>${escapeHtml(c.name)}</strong> may contain ${c.allergens.map(labelFor).join(', ')}`
+    ).join(' · ')}.</p>`;
+  }
+  div.innerHTML = `
+    <strong>${offenders.length ? '⚠️ Allergen alert' : '⚠️ Possible allergens'}</strong>
+    ${body}
+    <p class="allergen-warning__hint">You set these in your <a href="account.html?tab=profile">account profile</a>.</p>
+  `;
+
+  const layout = document.getElementById('cart-layout');
+  const list   = document.getElementById('basket-list');
+  if (layout && list) layout.insertBefore(div, list.parentNode);
+}
+
 // ---------- INIT ----------
 
 document.getElementById('proceed-checkout')?.addEventListener('click', () => {
@@ -166,9 +228,16 @@ document.getElementById('proceed-checkout')?.addEventListener('click', () => {
 
 render();
 loadAddons();
+renderAllergenWarning();
 
 // React to basket changes from any tab.
-document.addEventListener('basket-updated', () => render());
+document.addEventListener('basket-updated', () => {
+  render();
+  renderAllergenWarning();
+});
 window.addEventListener('storage', (e) => {
-  if (e.key === 'dd_basket') render();
+  if (e.key === 'dd_basket') {
+    render();
+    renderAllergenWarning();
+  }
 });

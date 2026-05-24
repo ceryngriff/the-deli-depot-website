@@ -5,6 +5,7 @@
 // =========================================================
 
 import { supabase } from './supabase.js';
+import { loadCustomerAllergens, checkMeal, buildWarningEl } from './allergens.js';
 
 let meal = null;
 const state = { bundle: '5', quantity: 1 };
@@ -151,6 +152,23 @@ function renderProductPage() {
   renderAccordionContent();
   setupEventListeners();
   updateAddButtonPrice();
+  renderAllergenWarning();
+}
+
+async function renderAllergenWarning() {
+  if (!meal) return;
+  const customerAllergens = await loadCustomerAllergens();
+  if (customerAllergens.length === 0) return;
+  const result = checkMeal({
+    allergens_contains:     meal.allergens_contains,
+    allergens_may_contain:  meal.allergens_may_contain
+  }, customerAllergens);
+  const banner = buildWarningEl(result);
+  if (!banner) return;
+  // Insert the warning right above the macros block
+  const info = document.querySelector('.product-info');
+  const macros = document.querySelector('.product-macros');
+  if (info && macros) info.insertBefore(banner, macros.parentNode);
 }
 
 function renderBundleSelector() {
