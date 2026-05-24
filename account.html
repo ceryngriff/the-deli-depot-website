@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Account | The Deli Depot</title>
+  <meta name="description" content="Manage your orders, subscriptions, and profile at The Deli Depot." />
+  <meta name="robots" content="noindex" />
+
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/meal-prep.css" />
+  <link rel="stylesheet" href="css/checkout.css" />
+  <link rel="stylesheet" href="css/account.css" />
+
+  <script src="js/env.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand" aria-label="The Deli Depot home">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+      </a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="primary-nav" class="nav__links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="menu.html">Meal Prep</a>
+        <a href="build-your-own.html">Build Your Own</a>
+        <button class="basket-counter" aria-label="Shopping basket">
+          <span>Basket</span>
+          <span class="basket-counter__badge">0</span>
+        </button>
+        <a href="account.html" class="btn btn--sm" data-account-button>My Account</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="meal-hero" aria-labelledby="account-title">
+      <p class="meal-hero__accent">Welcome back, <span id="account-greeting">there</span></p>
+      <h1 id="account-title" class="meal-hero__title">My Account</h1>
+    </section>
+
+    <div class="container account-page">
+      <div class="account-card">
+
+        <!-- Tabs -->
+        <div class="account-tabs" role="tablist" aria-label="Account sections">
+          <button class="account-tab is-active" data-tab="orders" role="tab"
+                  aria-selected="true" aria-controls="panel-orders" id="tab-orders">
+            My Orders
+          </button>
+          <button class="account-tab" data-tab="subscriptions" role="tab"
+                  aria-selected="false" aria-controls="panel-subscriptions" id="tab-subscriptions">
+            Subscriptions
+          </button>
+          <button class="account-tab" data-tab="profile" role="tab"
+                  aria-selected="false" aria-controls="panel-profile" id="tab-profile">
+            Profile
+          </button>
+        </div>
+
+        <!-- ORDERS PANEL -->
+        <div class="account-panel" id="panel-orders" data-panel="orders"
+             role="tabpanel" aria-labelledby="tab-orders">
+          <div id="orders-list"></div>
+          <div id="orders-empty" class="orders-empty" hidden>
+            <p>You haven't placed any orders yet.</p>
+            <a class="btn" href="menu.html">Browse the Menu</a>
+          </div>
+        </div>
+
+        <!-- SUBSCRIPTIONS PANEL -->
+        <div class="account-panel" id="panel-subscriptions" data-panel="subscriptions"
+             role="tabpanel" aria-labelledby="tab-subscriptions" hidden>
+          <div id="subs-list"></div>
+          <div id="subs-empty" class="subs-empty" hidden>
+            <p>No active subscriptions. Save 10% with a weekly plan.</p>
+            <a class="btn" href="subscriptions.html">Browse Plans</a>
+          </div>
+        </div>
+
+        <!-- PROFILE PANEL -->
+        <div class="account-panel" id="panel-profile" data-panel="profile"
+             role="tabpanel" aria-labelledby="tab-profile" hidden>
+          <form id="profile-form" class="profile-form" novalidate>
+            <label class="checkout-field">
+              <span>Full Name</span>
+              <input type="text" name="fullName" autocomplete="name" />
+            </label>
+            <label class="checkout-field">
+              <span>Email</span>
+              <input type="email" name="email" autocomplete="email" />
+            </label>
+            <label class="checkout-field">
+              <span>Phone</span>
+              <input type="tel" name="phone" autocomplete="tel" />
+            </label>
+            <button type="submit" class="btn">Save Profile</button>
+          </form>
+
+          <div class="profile-actions">
+            <button type="button" class="btn btn--outline" id="change-password-btn">Change Password</button>
+            <button type="button" class="btn btn--outline" id="sign-out-btn" data-sign-out>Sign Out</button>
+          </div>
+
+          <div class="danger-zone">
+            <h3>Danger Zone</h3>
+            <p>Deleting your account removes your data within 7 days. You can't undo this once we've processed it.</p>
+            <button type="button" class="btn btn--danger" id="delete-account-btn">Delete My Account</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__bottom">
+        <p>&copy; <span id="year"></span> The Deli Depot. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script src="js/basket.js"></script>
+  <script type="module" src="js/account.js"></script>
+  <script type="module" src="js/nav.js"></script>
+</body>
+</html>
