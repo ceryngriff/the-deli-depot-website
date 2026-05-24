@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subscribe &amp; Save | The Deli Depot</title>
+  <meta name="description" content="Subscribe to weekly meal-prep deliveries. Pick the plan that fits — Set & Forget, Surprise Me, or Custom. 10% off every week, pause anytime." />
+
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/meal-prep.css" />
+  <link rel="stylesheet" href="css/account.css" />
+  <link rel="stylesheet" href="css/subscriptions.css" />
+
+  <script src="js/env.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__brand" aria-label="The Deli Depot home">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+      </a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="primary-nav" class="nav__links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="menu.html">Meal Prep</a>
+        <a href="build-your-own.html">Build Your Own</a>
+        <button class="basket-counter" aria-label="Shopping basket">
+          <span>Basket</span>
+          <span class="basket-counter__badge">0</span>
+        </button>
+        <a href="login.html" class="btn btn--sm" data-account-button>Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="meal-hero" aria-labelledby="subs-title">
+      <p class="meal-hero__accent">Subscribe &amp; Save</p>
+      <h1 id="subs-title" class="meal-hero__title">10% Off Every Week</h1>
+      <p class="meal-hero__meta">
+        <span>Pick a plan</span>
+        <span>Pause anytime</span>
+        <span>Cancel anytime</span>
+      </p>
+    </section>
+
+    <div class="container subs-page">
+
+      <div class="plans-grid">
+
+        <!-- SET & FORGET -->
+        <article class="plan-card">
+          <p class="plan-card__accent">Easy mode</p>
+          <h2 class="plan-card__title">Set &amp; Forget</h2>
+          <p class="plan-card__desc">Pick your meals once. We send the same selection every week so you never have to think about it.</p>
+          <ul class="plan-card__perks">
+            <li>Same meals every week</li>
+            <li>10% off the bundle price</li>
+            <li>Pause or swap any time</li>
+          </ul>
+          <button class="btn plan-card__cta" data-plan-card="set_and_forget">Choose Set &amp; Forget</button>
+        </article>
+
+        <!-- SURPRISE ME -->
+        <article class="plan-card plan-card--featured">
+          <p class="plan-card__accent">Most popular</p>
+          <h2 class="plan-card__title">Surprise Me</h2>
+          <p class="plan-card__desc">We pick 5 rotating meals each week — variety, what's in season, what we're proud of.</p>
+          <ul class="plan-card__perks">
+            <li>Chef picks weekly</li>
+            <li>10% off the bundle price</li>
+            <li>Pause or cancel anytime</li>
+          </ul>
+          <button class="btn plan-card__cta" data-plan-card="surprise_me">Choose Surprise Me</button>
+        </article>
+
+        <!-- CUSTOM -->
+        <article class="plan-card">
+          <p class="plan-card__accent">Full control</p>
+          <h2 class="plan-card__title">Custom</h2>
+          <p class="plan-card__desc">Build your weekly box from the live menu — swap meals every week to match training, mood, or schedule.</p>
+          <ul class="plan-card__perks">
+            <li>Choose fresh each week</li>
+            <li>10% off the bundle price</li>
+            <li>Most flexible plan</li>
+          </ul>
+          <button class="btn plan-card__cta" data-plan-card="custom">Choose Custom</button>
+        </article>
+
+      </div>
+
+      <div style="text-align: center; margin-top: 2rem; color: var(--cream-muted); font-size: 0.9rem;">
+        All plans collect from <strong>Unit 5, Pant Industrial Estate, Merthyr Tydfil</strong>.<br />
+        Payment is taken in person on collection — no card needed to subscribe.
+      </div>
+
+    </div>
+  </main>
+
+  <!-- WIZARD MODAL -->
+  <dialog id="wizard" class="wizard-modal" aria-labelledby="wizard-title">
+    <div class="wizard">
+      <button id="wizard-close" class="wizard__close" aria-label="Close">&times;</button>
+
+      <div id="wizard-step-indicator" class="wizard__step-indicator" aria-hidden="true"></div>
+
+      <div id="wizard-content" class="wizard__content"></div>
+
+      <p id="wizard-error" class="wizard__error" hidden role="alert"></p>
+
+      <div class="wizard__actions">
+        <button type="button" id="wizard-back" class="btn btn--outline">Back</button>
+        <button type="button" id="wizard-next" class="btn">Continue</button>
+      </div>
+    </div>
+  </dialog>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__bottom">
+        <p>&copy; <span id="year"></span> The Deli Depot. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script src="js/basket.js"></script>
+  <script type="module" src="js/subscriptions.js"></script>
+  <script type="module" src="js/nav.js"></script>
+</body>
+</html>
