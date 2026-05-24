@@ -328,9 +328,29 @@ async function placeOrder() {
     }));
   } catch (e) { /* sessionStorage might be unavailable */ }
 
-  // 4. Empty the basket and redirect
+  // 4. Fire-and-forget confirmation email (non-blocking).
+  // Endpoint only exists on the Netlify-deployed site — locally
+  // this will 404 / network-error and we log + move on.
+  sendConfirmationEmail(order, itemRows).catch((err) => {
+    console.warn('[checkout] confirmation email did not send:', err);
+  });
+
+  // 5. Empty the basket and redirect
   basket.clearBasket();
   window.location.href = `order-confirmation.html?order=${encodeURIComponent(order.order_number)}`;
+}
+
+async function sendConfirmationEmail(order, items) {
+  const resp = await fetch('/.netlify/functions/send-order-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ order, items })
+  });
+  // We don't care about the result — order is already created.
+  // The Netlify Function logs failures on its side.
+  if (!resp.ok) {
+    console.warn('[checkout] email function returned', resp.status);
+  }
 }
 
 // ---------- INIT ----------
