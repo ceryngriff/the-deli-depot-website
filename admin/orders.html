@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orders | Admin | The Deli Depot</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/account.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+
+  <script src="../js/env.js"></script>
+</head>
+<body class="admin">
+
+  <div class="admin-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" aria-label="Admin navigation">
+      <a href="/admin/index.html" class="admin-sidebar__brand">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+        <span class="admin-sidebar__label">Admin</span>
+      </a>
+      <nav class="admin-nav" aria-label="Sections">
+        <a href="/admin/index.html">Dashboard</a>
+        <a href="/admin/menu.html">Menu</a>
+        <a href="/admin/orders.html" class="is-active">
+          Orders <span class="admin-nav__badge" data-pending-count hidden>0</span>
+        </a>
+        <a href="/admin/subscriptions.html">Subscriptions</a>
+        <a href="/admin/reports.html">Reports</a>
+      </nav>
+      <div class="admin-sidebar__bottom">
+        <nav class="admin-nav" aria-label="Account">
+          <a href="/index.html">Back to Site</a>
+          <a href="#" data-sign-out>Sign Out</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="admin-main">
+
+      <header class="admin-topbar">
+        <button class="admin-topbar__toggle" data-sidebar-toggle aria-label="Open menu">☰</button>
+        <h1 class="admin-topbar__title">Orders</h1>
+        <span class="admin-topbar__greeting">Hi, <span data-admin-greeting>Admin</span></span>
+      </header>
+
+      <main class="admin-content">
+
+        <!-- Status tabs -->
+        <div id="status-tabs" class="admin-tabs" role="tablist" aria-label="Order status"></div>
+
+        <!-- Toolbar -->
+        <div class="admin-toolbar">
+          <input type="search" id="search-input" class="admin-toolbar__search"
+                 placeholder="Search by order number, name, email…" autocomplete="off" />
+          <select id="date-filter" class="admin-toolbar__select" aria-label="Date filter">
+            <option value="all">Any collection date</option>
+            <option value="today">Today</option>
+            <option value="tomorrow">Tomorrow</option>
+            <option value="week">This week</option>
+          </select>
+        </div>
+
+        <!-- Table -->
+        <div class="admin-table-wrap">
+          <div class="admin-table-scroll">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Customer</th>
+                  <th>Items</th>
+                  <th>Collection</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Payment</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="orders-tbody">
+                <tr><td colspan="8" class="admin-table__empty">Loading orders…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="orders-count" class="admin-footer-count"></div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ===== ORDER DETAIL MODAL ===== -->
+  <dialog id="order-modal" class="admin-modal" aria-labelledby="order-modal-title">
+    <div class="admin-modal__inner">
+      <header class="admin-modal__header">
+        <h2 id="order-modal-title" class="admin-modal__title">Order Detail</h2>
+        <button type="button" id="order-modal-close" class="admin-modal__close" aria-label="Close">&times;</button>
+      </header>
+      <div id="order-modal-body" class="admin-modal__body"></div>
+    </div>
+  </dialog>
+
+  <script type="module" src="../js/admin-orders.js"></script>
+</body>
+</html>
