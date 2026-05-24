@@ -174,3 +174,6 @@ const MealPrepBasket = (() => {
     updateBasketCounter
   };
 })();
+
+// Expose on window so ES modules (menu.js, meal.js, etc.) can reach it.
+window.MealPrepBasket = MealPrepBasket;
