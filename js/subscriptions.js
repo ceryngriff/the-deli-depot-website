@@ -39,8 +39,7 @@ const COLLECTION_DAYS = [
 const TIME_SLOTS = [
   { value: '08:00', label: '8:00 AM' },
   { value: '12:00', label: '12:00 PM' },
-  { value: '17:00', label: '5:00 PM' },
-  { value: '19:00', label: '7:00 PM' }
+  { value: '17:00', label: '5:00 PM' }
 ];
 
 const state = {

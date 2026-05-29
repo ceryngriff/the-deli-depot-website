@@ -26,8 +26,7 @@ const COLLECTION_DAYS = [
 const TIME_SLOTS = [
   ['08:00', '8:00 AM'],
   ['12:00', '12:00 PM'],
-  ['17:00', '5:00 PM'],
-  ['19:00', '7:00 PM']
+  ['17:00', '5:00 PM']
 ];
 
 let subscriptions = [];

@@ -206,7 +206,7 @@ Change once → everything updates.
 
 ### Collection time slots
 
-Edit `TIME_SLOTS` in [`js/checkout.js`](js/checkout.js) (customer order checkout) and [`js/subscriptions.js`](js/subscriptions.js) (sub signup wizard). Defaults are 8 AM / 12 PM / 5 PM / 7 PM.
+Edit `TIME_SLOTS` in [`js/checkout.js`](js/checkout.js) (customer order checkout), [`js/subscriptions.js`](js/subscriptions.js) (sub signup wizard), and [`js/admin-subscriptions.js`](js/admin-subscriptions.js) (admin slot changes — keep all three in sync). Defaults are 8 AM / 12 PM / 5 PM.
 
 ---
 
