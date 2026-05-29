@@ -14,8 +14,8 @@
 // gracefully (logs a warning, doesn't block order creation).
 // =========================================================
 
-const FROM_ADDRESS = 'Deli Depot <orders@thedelidepot.co.uk>';
-const REPLY_TO     = 'hello@thedelidepot.co.uk';
+const FROM_ADDRESS = 'Deli Depot <orders@thedelidepot.com>';
+const REPLY_TO     = 'hello@thedelidepot.com';
 
 exports.handler = async (event) => {
   // Allow same-origin POST + CORS preflight from the deployed site

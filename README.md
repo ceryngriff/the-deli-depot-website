@@ -129,7 +129,7 @@ Then open <http://localhost:8000>.
 
 ## Day-to-day: managing the menu
 
-Almost everything happens in the **admin dashboard** at <https://thedelidepot.co.uk/admin/> (or `localhost:8000/admin/` during dev).
+Almost everything happens in the **admin dashboard** at <https://thedelidepot.com/admin/> (or `localhost:8000/admin/` during dev).
 
 - **Add a meal** → Menu → "+ New Meal" → fill in slug, name, prices, macros, upload an image. Save.
 - **Hide a meal from the customer menu** → toggle the Active switch off in the row.
@@ -183,7 +183,7 @@ In [`index.html`](index.html) search and replace:
 | ---------------------------- | -------------------------- |
 | `TBC (add phone number)`     | real phone number          |
 | `+44-000-000-0000`           | real phone in schema block |
-| `hello@thedelidepot.co.uk`   | real email                 |
+| `hello@thedelidepot.com`   | real email                 |
 
 Social links: replace the bare `facebook.com/`, `tiktok.com/`, `instagram.com/` URLs in the footer.
 

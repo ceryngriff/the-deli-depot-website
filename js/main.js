@@ -146,7 +146,7 @@ function handleContactForm(e) {
   const body = encodeURIComponent(
     `From: ${name} <${email}>\n\n${message}`
   );
-  const mail = `mailto:hello@thedelidepot.co.uk?subject=${encodeURIComponent(subject)}&body=${body}`;
+  const mail = `mailto:hello@thedelidepot.com?subject=${encodeURIComponent(subject)}&body=${body}`;
   window.location.href = mail;
 
   if (status) status.textContent = 'Opening your email app…';

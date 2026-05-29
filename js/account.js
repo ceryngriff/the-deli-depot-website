@@ -353,7 +353,7 @@ function setupDeleteAccount() {
       'If you change your mind, sign back in within that time.'
     )) return;
     await signOut();
-    toast('Signed out. Email hello@thedelidepot.co.uk to finish deletion.', 'info', 8000);
+    toast('Signed out. Email hello@thedelidepot.com to finish deletion.', 'info', 8000);
     setTimeout(() => { window.location.href = 'index.html'; }, 1500);
   });
 }
