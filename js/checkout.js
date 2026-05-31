@@ -28,14 +28,13 @@ const CUTOFF_HOUR = 17; // 5pm
 
 // Returns the earliest collection date (YYYY-MM-DD) given current time.
 // Rule: order by 5pm for next-day collection. After 5pm → day after tomorrow.
-// Skip Sundays (deli is closed).
+// Open 7 days a week, so no days are skipped.
 function getEarliestCollectionDate() {
   const now = new Date();
   let earliest = new Date(now);
   earliest.setHours(0, 0, 0, 0);
   if (now.getHours() >= CUTOFF_HOUR) earliest.setDate(earliest.getDate() + 2);
   else earliest.setDate(earliest.getDate() + 1);
-  while (earliest.getDay() === 0) earliest.setDate(earliest.getDate() + 1);
   return earliest;
 }
 
@@ -154,16 +153,7 @@ async function setupDatePicker() {
 
   await refreshTimeSlots(dateInput.value);
 
-  // Prevent Sunday selection (input type=date doesn't natively block weekdays).
   dateInput.addEventListener('change', async () => {
-    const chosen = new Date(dateInput.value);
-    if (chosen.getDay() === 0) {
-      // Bump to Monday
-      chosen.setDate(chosen.getDate() + 1);
-      dateInput.value = toISODate(chosen);
-      showError('Sunday is closed — moved your collection to Monday.');
-      setTimeout(hideError, 4000);
-    }
     await refreshTimeSlots(dateInput.value);
   });
 }
@@ -175,14 +165,21 @@ async function refreshTimeSlots(dateStr) {
   if (!timeSelect) return;
   const prevValue = timeSelect.value;
 
-  const { data, error } = await supabase.rpc('slot_availability', { p_date: dateStr });
+  // Render the plain slots first so the dropdown is NEVER empty — even if
+  // the availability lookup throws (e.g. Supabase unreachable / misconfigured).
+  timeSelect.innerHTML = TIME_SLOTS
+    .map((s) => `<option value="${s.value}">${escapeHtml(s.label)}</option>`)
+    .join('');
+
+  let data, error;
+  try {
+    ({ data, error } = await supabase.rpc('slot_availability', { p_date: dateStr }));
+  } catch (e) {
+    error = e; // a thrown rejection (network failure) — treat like a returned error
+  }
   if (error) {
-    console.warn('[checkout] slot_availability', error);
-    // Fall back to plain slots so checkout still works if the RPC fails
-    timeSelect.innerHTML = TIME_SLOTS
-      .map((s) => `<option value="${s.value}">${escapeHtml(s.label)}</option>`)
-      .join('');
-    return;
+    console.warn('[checkout] slot_availability unavailable — showing all slots', error);
+    return; // base slots already rendered above
   }
 
   const availMap = new Map((data || []).map((a) => [a.time_slot, a]));
