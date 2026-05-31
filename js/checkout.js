@@ -3,9 +3,9 @@
 // Collection slot picker + contact form + order creation.
 // Supports both signed-in users and guest checkout.
 //
-// TODO: Stripe integration — when payments go live, add a
+// TODO: Stripe integration — when phayments go live, add a
 // "Pay now" step between order insert and confirmation.
-// =========================================================
+// =================================h========================
 
 import { supabase } from './supabase.js';
 import { getSession, getCurrentProfile } from './auth.js';
@@ -173,7 +173,9 @@ async function refreshTimeSlots(dateStr) {
 
   let data, error;
   try {
-    ({ data, error } = await supabase.rpc('slot_availability', { p_date: dateStr }));
+        const rpcPromise = supabase.rpc('slot_availability', { p_date: dateStr });
+        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000));
+        ({ data, error } = await Promise.race([rpcPromise, timeout]));
   } catch (e) {
     error = e; // a thrown rejection (network failure) — treat like a returned error
   }
