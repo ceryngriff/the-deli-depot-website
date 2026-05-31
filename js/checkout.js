@@ -245,7 +245,7 @@ async function placeOrder() {
 
   // Re-check capacity at submit time (another customer could have filled
   // this slot while we were on the page).
-  const { data: avail } = await supabase.rpc('slot_availability', { p_date: date });
+  const { data: avail } = (await Promise.race([supabase.rpc('slot_availability', { p_date: date }), new Promise(r => setTimeout(() => r({ data: null }), 3000))])) ?? { data: null };
   const thisSlot = (avail || []).find((a) => a.time_slot === time);
   if (thisSlot && thisSlot.used >= thisSlot.max_orders) {
     showError('Sorry — that slot just filled up while you were checking out. Please pick another time.');
