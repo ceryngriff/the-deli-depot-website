@@ -15,7 +15,8 @@ Desktop.ini
 .env
 .env.*
 !.env.example
-js/env.js
+# NOTE: js/env.js is intentionally committed — it holds only the public
+# Supabase URL + publishable (anon) key, which are safe to expose.
 
 # Node (if you add a build step later)
 node_modules/

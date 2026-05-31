@@ -1,6 +1,17 @@
-// env.js — Supabase config placeholder.
-// The real config (window.SUPABASE_CONFIG) is injected by Netlify snippet injection
-// before </head> on every page. This file exists only so the browser does not
-// receive a 503 when the HTML also references it via <script src>.
+// =========================================================
+// SUPABASE CONFIG
+// =========================================================
+// Holds the project URL + PUBLISHABLE (anon) key. This key is
+// designed to be exposed in the browser — it only permits what
+// Row Level Security allows, so it is safe to commit to the repo.
+// (The secret service_role key is NEVER used in this codebase.)
 //
-// DO NOT put real credentials here — this file is public in the repository.
+// To point the site at a different Supabase project, change the
+// two values below. Netlify snippet injection can still override
+// this at deploy time if you ever prefer to keep keys out of git.
+// =========================================================
+
+window.SUPABASE_CONFIG = {
+  url: 'https://wcfvnlntkhpnokrejljl.supabase.co',
+  anonKey: 'sb_publishable_0-zClgevOpdbSC3T7HIXmg_LPgkW2VQ'
+};
