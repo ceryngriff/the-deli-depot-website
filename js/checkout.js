@@ -255,8 +255,17 @@ async function placeOrder() {
   }
 
   // Re-check capacity at submit time (another customer could have filled
-  // this slot while we were on the page).
-  const { data: avail } = (await Promise.race([supabase.rpc('slot_availability', { p_date: date }), new Promise(r => setTimeout(() => r({ data: null }), 3000))])) ?? { data: null };
+  // this slot while we were on the page). Fail OPEN: if the lookup throws or
+  // times out (Supabase slow/unreachable), let the order through rather than
+  // silently aborting — the DB still enforces the real cap on insert.
+  let avail = null;
+  try {
+    const rpcPromise = supabase.rpc('slot_availability', { p_date: date });
+    const timeout = new Promise((r) => setTimeout(() => r({ data: null }), 3000));
+    ({ data: avail } = (await Promise.race([rpcPromise, timeout])) ?? { data: null });
+  } catch (e) {
+    console.warn('[checkout] capacity re-check unavailable — proceeding', e);
+  }
   const thisSlot = (avail || []).find((a) => a.time_slot === time);
   if (thisSlot && thisSlot.used >= thisSlot.max_orders) {
     showError('Sorry — that slot just filled up while you were checking out. Please pick another time.');
@@ -265,7 +274,8 @@ async function placeOrder() {
   }
 
   const subtotal = basket.getBasketTotal();
-  const session = await getSession();
+  let session = null;
+  try { session = await getSession(); } catch (e) { console.warn('[checkout] getSession failed — treating as guest', e); }
   const customerId = session?.user?.id || null;
 
   const submitBtn = document.getElementById('place-order-btn');
