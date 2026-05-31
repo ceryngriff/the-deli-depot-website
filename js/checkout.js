@@ -212,6 +212,17 @@ async function refreshTimeSlots(dateStr) {
   }
 }
 
+// Reject if a promise doesn't settle within `ms`, so a hung network request
+// (e.g. Supabase unreachable) can't leave the button stuck on "Placing order…".
+function withTimeout(promise, ms) {
+  return Promise.race([
+    Promise.resolve(promise),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`Request timed out after ${ms}ms`)), ms)
+    )
+  ]);
+}
+
 // ---------- PLACE ORDER ----------
 
 async function placeOrder() {
@@ -264,27 +275,35 @@ async function placeOrder() {
   }
 
   // 1. Insert the order
-  const { data: order, error: orderErr } = await supabase
-    .from('orders')
-    .insert({
-      customer_id:     customerId,
-      customer_email:  email,
-      customer_name:   fullName,
-      customer_phone:  phone,
-      status:          'pending',
-      collection_slot: collectionDateTime.toISOString(),
-      subtotal:        subtotal,
-      total:           subtotal,
-      notes:           notes || null,
-      payment_status:  'unpaid'
-    })
-    .select()
-    .single();
+  let order, orderErr;
+  try {
+    ({ data: order, error: orderErr } = await withTimeout(
+      supabase
+        .from('orders')
+        .insert({
+          customer_id:     customerId,
+          customer_email:  email,
+          customer_name:   fullName,
+          customer_phone:  phone,
+          status:          'pending',
+          collection_slot: collectionDateTime.toISOString(),
+          subtotal:        subtotal,
+          total:           subtotal,
+          notes:           notes || null,
+          payment_status:  'unpaid'
+        })
+        .select()
+        .single(),
+      12000
+    ));
+  } catch (e) {
+    orderErr = e; // timeout or network rejection
+  }
 
   if (orderErr || !order) {
     console.error('[checkout] order insert', orderErr);
     if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Place Order'; }
-    showError(`We couldn't place your order: ${orderErr?.message || 'Unknown error'}`);
+    showError(`We couldn't place your order: ${orderErr?.message || 'Unknown error'}. Please try again.`);
     return;
   }
 
@@ -307,7 +326,14 @@ async function placeOrder() {
     macros: item.macros || null
   }));
 
-  const { error: itemsErr } = await supabase.from('order_items').insert(itemRows);
+  let itemsErr;
+  try {
+    ({ error: itemsErr } = await withTimeout(
+      supabase.from('order_items').insert(itemRows), 12000
+    ));
+  } catch (e) {
+    itemsErr = e; // timeout or network rejection
+  }
 
   if (itemsErr) {
     console.error('[checkout] items insert', itemsErr);
