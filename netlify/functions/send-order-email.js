@@ -14,7 +14,11 @@
 // gracefully (logs a warning, doesn't block order creation).
 // =========================================================
 
-const FROM_ADDRESS = 'Deli Depot <orders@thedelidepot.com>';
+// FROM defaults to the deli's own domain (needs that domain verified in
+// Resend). For a quick start before DNS is set up, set EMAIL_FROM in Netlify
+// to 'Deli Depot <onboarding@resend.dev>' — Resend's test sender, which can
+// email your own Resend-account address without any domain verification.
+const FROM_ADDRESS = process.env.EMAIL_FROM || 'Deli Depot <orders@thedelidepot.com>';
 const REPLY_TO     = 'hello@thedelidepot.com';
 
 exports.handler = async (event) => {
