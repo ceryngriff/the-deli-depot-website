@@ -59,45 +59,58 @@ exports.handler = async (event) => {
   }
 
   // --- Build the email ---
-  const subject = `Order ${order.order_number} confirmed — The Deli Depot`;
-  const html = buildHtml(order, items || []);
-  const text = buildText(order, items || []);
+  // Where the deli's own "new order" alert goes. Set ORDER_NOTIFY_EMAIL in
+  // Netlify env vars (kept out of the repo). Falls back to the reply-to.
+  const notifyTo = process.env.ORDER_NOTIFY_EMAIL || REPLY_TO;
 
-  // --- Send via Resend ---
-  try {
+  // Helper: send one email via Resend. Returns { ok, status, result }.
+  async function send({ to, subject, html, text }) {
     const resp = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type':  'application/json'
       },
-      body: JSON.stringify({
-        from:     FROM_ADDRESS,
-        to:       order.customer_email,
-        reply_to: REPLY_TO,
-        subject,
-        html,
-        text
-      })
+      body: JSON.stringify({ from: FROM_ADDRESS, to, reply_to: REPLY_TO, subject, html, text })
     });
-
     const result = await resp.json().catch(() => ({}));
+    return { ok: resp.ok, status: resp.status, result };
+  }
 
-    if (!resp.ok) {
-      // Don't 500 — the order was already created in Supabase. Let the
-      // client know the email failed but the order succeeded.
-      console.error('[send-order-email] Resend rejected:', resp.status, result);
-      return {
-        statusCode: 200,
-        headers: corsHeaders,
-        body: JSON.stringify({ ok: false, emailFailed: true, error: result })
-      };
+  try {
+    // 1. Customer confirmation
+    const customer = await send({
+      to:      order.customer_email,
+      subject: `Order ${order.order_number} confirmed — The Deli Depot`,
+      html:    buildHtml(order, items || []),
+      text:    buildText(order, items || [])
+    });
+    if (!customer.ok) console.error('[send-order-email] customer email rejected:', customer.status, customer.result);
+
+    // 2. Deli's own new-order alert
+    let deli = { ok: false };
+    if (notifyTo) {
+      deli = await send({
+        to:      notifyTo,
+        subject: `🛎 New order ${order.order_number} — ${order.customer_name || 'Guest'}`,
+        html:    buildDeliHtml(order, items || []),
+        text:    buildDeliText(order, items || [])
+      });
+      if (!deli.ok) console.error('[send-order-email] deli alert rejected:', deli.status, deli.result);
     }
 
+    // The order already exists in Supabase, so never fail the request — just
+    // report what happened with each email.
     return {
       statusCode: 200,
       headers: corsHeaders,
-      body: JSON.stringify({ ok: true, id: result.id })
+      body: JSON.stringify({
+        ok: customer.ok && deli.ok,
+        customerEmailSent: customer.ok,
+        deliAlertSent: deli.ok,
+        customerEmailId: customer.result?.id,
+        deliAlertId: deli.result?.id
+      })
     };
   } catch (err) {
     console.error('[send-order-email] Network error:', err);
@@ -280,5 +293,59 @@ function buildText(order, items) {
   lines.push('');
   lines.push('The Deli Depot');
   lines.push('Unit 5, Pant Industrial Estate, Merthyr Tydfil');
+  return lines.join('\n');
+}
+
+// ---------- DELI NOTIFICATION (sent to the shop, not the customer) ----------
+
+function buildDeliHtml(order, items) {
+  const collection = formatCollection(order.collection_slot);
+  const total = parseFloat(order.total || 0).toFixed(2);
+  const itemsHtml = (items.length ? items : []).map((it) => `
+    <tr>
+      <td style="padding:8px 0;border-bottom:1px solid #ddd;">
+        <strong>${escapeHtml(it.meal_name)}</strong> — ${escapeHtml(bundleLabel(it.bundle_type))} &times; ${it.quantity}
+      </td>
+      <td style="padding:8px 0;border-bottom:1px solid #ddd;text-align:right;white-space:nowrap;">£${parseFloat(it.line_total || 0).toFixed(2)}</td>
+    </tr>`).join('') || `<tr><td colspan="2" style="padding:8px 0;color:#a00;">(No items recorded)</td></tr>`;
+
+  return `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;color:#1a1a1a;">
+    <h2 style="margin:0 0 4px;">New order: ${escapeHtml(order.order_number)}</h2>
+    <p style="margin:0 0 16px;color:#555;">Collection: <strong>${escapeHtml(collection)}</strong></p>
+
+    <h3 style="margin:16px 0 6px;">Customer</h3>
+    <p style="margin:0;line-height:1.6;">
+      ${escapeHtml(order.customer_name || 'Guest')}<br/>
+      Phone: <a href="tel:${escapeHtml(order.customer_phone || '')}">${escapeHtml(order.customer_phone || '—')}</a><br/>
+      Email: <a href="mailto:${escapeHtml(order.customer_email || '')}">${escapeHtml(order.customer_email || '—')}</a>
+    </p>
+
+    <h3 style="margin:18px 0 6px;">Items</h3>
+    <table cellpadding="0" cellspacing="0" width="100%" style="max-width:520px;">${itemsHtml}
+      <tr><td style="padding:10px 0 0;"><strong>Total</strong></td>
+          <td style="padding:10px 0 0;text-align:right;"><strong>£${total}</strong></td></tr>
+    </table>
+    ${order.notes ? `<h3 style="margin:18px 0 6px;">Customer note</h3><p style="margin:0;">${escapeHtml(order.notes)}</p>` : ''}
+    <p style="margin:22px 0 0;color:#888;font-size:12px;">Payment due on collection. Manage this order in your admin dashboard.</p>
+  </body></html>`;
+}
+
+function buildDeliText(order, items) {
+  const lines = [];
+  lines.push(`NEW ORDER: ${order.order_number}`);
+  lines.push(`Collection: ${formatCollection(order.collection_slot)}`);
+  lines.push('');
+  lines.push(`Customer: ${order.customer_name || 'Guest'}`);
+  lines.push(`Phone:    ${order.customer_phone || '—'}`);
+  lines.push(`Email:    ${order.customer_email || '—'}`);
+  lines.push('');
+  lines.push('Items:');
+  (items.length ? items : []).forEach((it) => {
+    lines.push(`  · ${it.meal_name} (${bundleLabel(it.bundle_type)} × ${it.quantity}) — £${parseFloat(it.line_total || 0).toFixed(2)}`);
+  });
+  if (!items.length) lines.push('  (No items recorded)');
+  lines.push('');
+  lines.push(`Total: £${parseFloat(order.total || 0).toFixed(2)} (due on collection)`);
+  if (order.notes) { lines.push(''); lines.push(`Customer note: ${order.notes}`); }
   return lines.join('\n');
 }
