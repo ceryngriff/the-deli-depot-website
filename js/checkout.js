@@ -274,9 +274,6 @@ async function placeOrder() {
   }
 
   const subtotal = basket.getBasketTotal();
-  let session = null;
-  try { session = await getSession(); } catch (e) { console.warn('[checkout] getSession failed — treating as guest', e); }
-  const customerId = session?.user?.id || null;
 
   const submitBtn = document.getElementById('place-order-btn');
   if (submitBtn) {
@@ -284,42 +281,8 @@ async function placeOrder() {
     submitBtn.textContent = 'Placing order…';
   }
 
-  // 1. Insert the order
-  let order, orderErr;
-  try {
-    ({ data: order, error: orderErr } = await withTimeout(
-      supabase
-        .from('orders')
-        .insert({
-          customer_id:     customerId,
-          customer_email:  email,
-          customer_name:   fullName,
-          customer_phone:  phone,
-          status:          'pending',
-          collection_slot: collectionDateTime.toISOString(),
-          subtotal:        subtotal,
-          total:           subtotal,
-          notes:           notes || null,
-          payment_status:  'unpaid'
-        })
-        .select()
-        .single(),
-      12000
-    ));
-  } catch (e) {
-    orderErr = e; // timeout or network rejection
-  }
-
-  if (orderErr || !order) {
-    console.error('[checkout] order insert', orderErr);
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Place Order'; }
-    showError(`We couldn't place your order: ${orderErr?.message || 'Unknown error'}. Please try again.`);
-    return;
-  }
-
-  // 2. Insert order_items
+  // Build the line items for the order.
   const itemRows = items.map((item) => ({
-    order_id:      order.id,
     meal_id:       item.meal_id || null,
     meal_name:     item.name,
     bundle_type:   toBundleType(item.bundle),
@@ -336,36 +299,64 @@ async function placeOrder() {
     macros: item.macros || null
   }));
 
-  let itemsErr;
+  // 1. Create the order + items in one server-side call. This runs through
+  // the place_order() database function (SECURITY DEFINER), which lets guests
+  // (who have no auth identity) create their own order without tripping the
+  // owner-scoped Row Level Security policies — and returns the new order
+  // number so we don't need a separate, RLS-blocked read-back.
+  let order, orderErr;
   try {
-    ({ error: itemsErr } = await withTimeout(
-      supabase.from('order_items').insert(itemRows), 12000
+    ({ data: order, error: orderErr } = await withTimeout(
+      supabase.rpc('place_order', {
+        p_email:          email,
+        p_name:           fullName,
+        p_phone:          phone,
+        p_collection_slot: collectionDateTime.toISOString(),
+        p_subtotal:       subtotal,
+        p_total:          subtotal,
+        p_notes:          notes || null,
+        p_items:          itemRows
+      }).single(),
+      12000
     ));
   } catch (e) {
-    itemsErr = e; // timeout or network rejection
+    orderErr = e; // timeout or network rejection
   }
 
-  if (itemsErr) {
-    console.error('[checkout] items insert', itemsErr);
+  if (orderErr || !order) {
+    console.error('[checkout] place_order', orderErr);
     if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Place Order'; }
-    showError(`Order placed but items failed to save. Order number: ${order.order_number}. Please tell the deli.`);
+    showError(`We couldn't place your order: ${orderErr?.message || 'Unknown error'}. Please try again.`);
     return;
   }
 
-  // 3. Cache the order details so the confirmation page can show them
+  // 2. Cache the order details so the confirmation page can show them
   // even for guests (RLS won't let anon read their own orders back).
+  const cachedOrder = {
+    id:              order.id,
+    order_number:    order.order_number,
+    customer_name:   fullName,
+    customer_email:  email,
+    customer_phone:  phone,
+    status:          'pending',
+    collection_slot: collectionDateTime.toISOString(),
+    subtotal:        subtotal,
+    total:           subtotal,
+    notes:           notes || null,
+    payment_status:  'unpaid'
+  };
   try {
     sessionStorage.setItem('dd_last_order', JSON.stringify({
-      order,
+      order: cachedOrder,
       items: itemRows,
       cachedAt: new Date().toISOString()
     }));
   } catch (e) { /* sessionStorage might be unavailable */ }
 
-  // 4. Fire-and-forget confirmation email (non-blocking).
+  // 3. Fire-and-forget confirmation email (non-blocking).
   // Endpoint only exists on the Netlify-deployed site — locally
   // this will 404 / network-error and we log + move on.
-  sendConfirmationEmail(order, itemRows).catch((err) => {
+  sendConfirmationEmail(cachedOrder, itemRows).catch((err) => {
     console.warn('[checkout] confirmation email did not send:', err);
   });
 
