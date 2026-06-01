@@ -4,44 +4,44 @@
     "name": "The Depot Classic",
     "description": "Fresh ham, mature cheddar, tomato, crisp lettuce, home-made chutney on sourdough.",
     "tag": "Signature",
-    "image": "assets/images/the-depot-classic.png"
+    "image": "assets/images/the-depot-classic.webp"
   },
   {
     "category": "sandwiches",
     "name": "Welsh Rarebit Baguette",
     "description": "Caerphilly & mustard rarebit, spring onion, grilled on a crusty baguette.",
-    "image": "assets/images/rarebit.png"
+    "image": "assets/images/rarebit.webp"
   },
   {
     "category": "sandwiches",
     "name": "Chicken & Pesto",
     "description": "Roast chicken, basil pesto, rocket, sun-blush tomato on ciabatta.",
-    "image": "assets/images/chicken-pesto.png"
+    "image": "assets/images/chicken-pesto.webp"
   },
   {
     "category": "sandwiches",
     "name": "BLT",
     "description": "Streaky bacon, baby gem, tomato, proper mayo on toasted bloomer.",
-    "image": "assets/images/blt.png"
+    "image": "assets/images/blt.webp"
   },
   {
     "category": "sandwiches",
     "name": "Veggie Hummus Wrap",
     "description": "Roasted veg, hummus, feta, mixed leaves in a soft wrap.",
     "tag": "Veggie",
-    "image": "assets/images/hummus-wrap.png"
+    "image": "assets/images/hummus-wrap.webp"
   },
   {
     "category": "sandwiches",
     "name": "Brie & Cranberry",
     "description": "Creamy brie, tangy cranberry sauce, peppery rocket on a soft ciabatta. Christmas in a sandwich, all year round.",
-    "image": "assets/images/brie-cranberry.png"
+    "image": "assets/images/brie-cranberry.webp"
   },
   {
     "category": "sandwiches",
     "name": "Steak & Onion Baguette",
     "description": "Tender sliced steak, sweet caramelised onions, melted cheese and horseradish mayo in a crusty baguette.",
-    "image": "assets/images/steak-onion.png"
+    "image": "assets/images/steak-onion.webp"
   },
 
   {
@@ -61,14 +61,14 @@
     "name": "Soup of the Day",
     "description": "Fresh daily. Ask in store. Served with a warm roll & butter.",
     "tag": "Changes daily",
-    "image": "assets/images/soup-of-the-day.png"
+    "image": "assets/images/soup-of-the-day.webp"
   },
   {
     "category": "hot-food",
     "name": "Fully Loaded Jacket Potato",
     "description": "Crisp-skin jacket piled high with melted cheddar, crispy bacon bits, sour cream and fresh chives.",
     "tag": "Loaded",
-    "image": "assets/images/loaded-jacket-potato.png"
+    "image": "assets/images/loaded-jacket-potato.webp"
   },
   {
     "category": "hot-food",
@@ -85,7 +85,7 @@
     "name": "Welsh Cawl",
     "description": "Traditional Welsh lamb stew, slow-cooked with leeks, potatoes and root veg. Served with crusty bread and a wedge of Welsh cheese.",
     "tag": "Welsh",
-    "image": "assets/images/cawl.png"
+    "image": "assets/images/cawl.webp"
   },
 
   {
@@ -98,7 +98,7 @@
     "category": "drinks",
     "name": "Freshly Ground Coffee",
     "description": "Flat white, latte, cappuccino, americano, mocha. Oat, almond or soya available.",
-    "image": "assets/images/coffee.png"
+    "image": "assets/images/coffee.webp"
   },
   {
     "category": "drinks",
@@ -115,27 +115,27 @@
     "category": "sweet-treats",
     "name": "Oreo Brownies",
     "description": "Thick, fudgy chocolate brownies loaded with chunks of Oreo cookie. Rich, gooey and proper indulgent.",
-    "image": "assets/images/oreo-brownies.png"
+    "image": "assets/images/oreo-brownies.webp"
   },
   {
     "category": "sweet-treats",
     "name": "Bara Brith",
     "description": "Welsh fruit loaf, buttered. Proper.",
     "tag": "Welsh",
-    "image": "assets/images/bara-brith.png"
+    "image": "assets/images/bara-brith.webp"
   },
   {
     "category": "sweet-treats",
     "name": "White Chocolate Welsh Cakes",
     "description": "Griddled Welsh cakes filled with white chocolate buttercream — sugar-dusted, soft and buttery.",
     "tag": "Welsh",
-    "image": "assets/images/white-chocolate-welsh-cakes.png"
+    "image": "assets/images/white-chocolate-welsh-cakes.webp"
   },
   {
     "category": "pots",
     "name": "Depot Pots",
     "description": "Grab-and-go pots — yogurt & granola, fresh fruit, or high-protein. Made fresh in store, perfect for breakfast or a quick lunch.",
     "tag": "Fresh daily",
-    "image": "assets/images/depot-pots.png"
+    "image": "assets/images/depot-pots.webp"
   }
 ]
