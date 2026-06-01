@@ -289,7 +289,10 @@ a:hover, a:focus-visible { color: var(--gold-bright); }
 }
 .hero__overlay {
   position: absolute; inset: 0;
-  background: url("../assets/images/hero-bg.jpg") center/cover no-repeat;
+  /* Optional hero texture image. File was missing (caused a 404), so the
+     overlay is disabled. To use one, drop a photo at
+     assets/images/hero-bg.jpg and restore the background line below. */
+  /* background: url("../assets/images/hero-bg.jpg") center/cover no-repeat; */
   opacity: 0.18;
   z-index: -1;
   filter: grayscale(0.3) contrast(1.1);
