@@ -397,3 +397,8 @@ document.getElementById('checkout-form')?.addEventListener('submit', (e) => {
 renderSummary();
 prefillContact();
 setupDatePicker();
+
+// Signal to the inline guard in checkout.html that the real handler is live.
+// Until this is set, tapping Place Order means the module (incl. the Supabase
+// CDN import) hasn't finished loading — usually a slow/flaky connection.
+window.__checkoutReady = true;
