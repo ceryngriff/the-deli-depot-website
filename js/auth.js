@@ -22,7 +22,10 @@ export async function signUpWithPassword({ email, password, fullName }) {
 export async function signInWithPassword({ email, password }) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (!error && data?.user) {
-    await syncProfile(data.user).catch((e) => console.warn('[auth] profile sync', e));
+    // Fire-and-forget: keeping the profile row in sync must NOT block (or
+    // hang) the sign-in itself. A slow/blocked profile update here used to
+    // leave the button stuck on "Signing in…".
+    syncProfile(data.user).catch((e) => console.warn('[auth] profile sync', e));
   }
   return { data, error };
 }

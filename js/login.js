@@ -98,7 +98,26 @@ document.getElementById('signin-form')?.addEventListener('submit', async (e) => 
     return;
   }
   const done = setLoading(form.querySelector('button[type="submit"]'), 'Signing in…');
-  const { error } = await signInWithPassword({ email, password });
+  let error;
+  try {
+    // Guard against a hung request leaving the button stuck on "Signing in…":
+    // if it doesn't resolve in 15s, surface a clear, retryable error.
+    const result = await Promise.race([
+      signInWithPassword({ email, password }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('timeout')), 15000))
+    ]);
+    error = result.error;
+  } catch (err) {
+    done();
+    showMessage(
+      err?.message === 'timeout'
+        ? 'Sign-in is taking too long — check your connection and try again.'
+        : (err?.message || 'Sign-in failed. Please try again.'),
+      'error'
+    );
+    return;
+  }
   done();
   if (error) {
     showMessage(error.message || 'Sign-in failed.', 'error');
