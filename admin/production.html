@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Subscriptions | Admin | The Deli Depot</title>
+  <meta name="theme-color" content="#1a1a1a" />
+  <title>Production | Admin | The Deli Depot</title>
   <meta name="robots" content="noindex, nofollow" />
 
   <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg" />
@@ -14,6 +15,7 @@
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/account.css" />
   <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="stylesheet" href="../css/admin-production.css" />
 
   <script src="../js/env.js"></script>
 </head>
@@ -36,8 +38,8 @@
         <a href="/admin/orders.html">
           Orders <span class="admin-nav__badge" data-pending-count hidden>0</span>
         </a>
-        <a href="/admin/subscriptions.html" class="is-active">Subscriptions</a>
-        <a href="/admin/production.html">Production</a>
+        <a href="/admin/subscriptions.html">Subscriptions</a>
+        <a href="/admin/production.html" class="is-active">Production</a>
         <a href="/admin/reports.html">Reports</a>
       </nav>
       <div class="admin-sidebar__bottom">
@@ -53,59 +55,49 @@
 
       <header class="admin-topbar">
         <button class="admin-topbar__toggle" data-sidebar-toggle aria-label="Open menu">☰</button>
-        <h1 class="admin-topbar__title">Subscriptions</h1>
+        <h1 class="admin-topbar__title">Production</h1>
         <span class="admin-topbar__greeting">Hi, <span data-admin-greeting>Admin</span></span>
       </header>
 
-      <main class="admin-content">
+      <main class="admin-content admin-content--flush">
 
-        <!-- Status tabs -->
-        <div id="status-tabs" class="admin-tabs" role="tablist" aria-label="Subscription status"></div>
+        <div class="prod-app">
 
-        <!-- Toolbar -->
-        <div class="admin-toolbar">
-          <input type="search" id="search-input" class="admin-toolbar__search"
-                 placeholder="Search by customer name, email, plan…" autocomplete="off" />
-        </div>
-
-        <!-- Table -->
-        <div class="admin-table-wrap">
-          <div class="admin-table-scroll">
-            <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>Customer</th>
-                  <th>Plan</th>
-                  <th>Meals / wk</th>
-                  <th>Collection</th>
-                  <th>Next renewal</th>
-                  <th>Status</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="subs-tbody">
-                <tr><td colspan="7" class="admin-table__empty">Loading subscriptions…</td></tr>
-              </tbody>
-            </table>
+          <!-- Progress -->
+          <div class="prod-progress">
+            <div class="prod-progress__bar"><div class="prod-progress__fill" id="prodProgFill"></div></div>
+            <div class="prod-progress__lbl">
+              <span id="prodProgLabel"></span><span id="prodProgPct"></span>
+            </div>
           </div>
-          <div id="subs-count" class="admin-footer-count"></div>
+
+          <!-- Production line tabs -->
+          <div class="prod-toptabs" id="prodTopTabs" role="tablist" aria-label="Production line"></div>
+
+          <!-- View tabs -->
+          <div class="prod-subtabs" id="prodSubTabs" role="tablist" aria-label="View"></div>
+
+          <!-- Shopping-list filters -->
+          <div class="prod-filters" id="prodFilters" hidden></div>
+
+          <!-- Content -->
+          <div id="prodContent"></div>
+
         </div>
 
       </main>
+
+      <!-- Sticky bottom action bar -->
+      <div class="prod-bottombar">
+        <button class="prod-reset" data-action="reset">Reset</button>
+        <div class="prod-donecount">
+          <span id="prodDoneNum">0</span> / <span id="prodTotalNum">0</span> <span id="prodDoneSuffix">done</span>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- ===== SUBSCRIPTION DETAIL MODAL ===== -->
-  <dialog id="sub-modal" class="admin-modal" aria-labelledby="sub-modal-title">
-    <div class="admin-modal__inner">
-      <header class="admin-modal__header">
-        <h2 id="sub-modal-title" class="admin-modal__title">Subscription Detail</h2>
-        <button type="button" id="sub-modal-close" class="admin-modal__close" aria-label="Close">&times;</button>
-      </header>
-      <div id="sub-modal-body" class="admin-modal__body"></div>
-    </div>
-  </dialog>
-
-  <script type="module" src="../js/admin-subscriptions.js"></script>
+  <script type="module" src="../js/admin-production.js"></script>
 </body>
 </html>

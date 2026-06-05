@@ -44,3 +44,9 @@
   from = "/admin"
   to = "/admin/index.html"
   status = 200
+
+# Clean /admin/production URL → production tool
+[[redirects]]
+  from = "/admin/production"
+  to = "/admin/production.html"
+  status = 200
