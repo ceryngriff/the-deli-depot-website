@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fridge Temperatures | Admin | The Deli Depot</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/account.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+
+  <script src="../js/env.js"></script>
+</head>
+<body class="admin">
+
+  <div class="admin-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" aria-label="Admin navigation">
+      <a href="/admin/index.html" class="admin-sidebar__brand">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+        <span class="admin-sidebar__label">Admin</span>
+      </a>
+      <nav class="admin-nav" aria-label="Sections">
+        <a href="/admin/index.html">Dashboard</a>
+        <a href="/admin/menu.html">Menu</a>
+        <a href="/admin/orders.html">
+          Orders <span class="admin-nav__badge" data-pending-count hidden>0</span>
+        </a>
+        <a href="/admin/subscriptions.html">Subscriptions</a>
+        <a href="/admin/production.html">Production</a>
+        <a href="/admin/reports.html">Reports</a>
+        <a href="/admin/fridge-temperatures.html" class="is-active">Fridge Temps</a>
+      </nav>
+      <div class="admin-sidebar__bottom">
+        <nav class="admin-nav" aria-label="Account">
+          <a href="/index.html">Back to Site</a>
+          <a href="#" data-sign-out>Sign Out</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="admin-main">
+
+      <header class="admin-topbar">
+        <button class="admin-topbar__toggle" data-sidebar-toggle aria-label="Open menu">☰</button>
+        <h1 class="admin-topbar__title">Fridge Temperatures</h1>
+        <span class="admin-topbar__greeting">Hi, <span data-admin-greeting>Admin</span></span>
+      </header>
+
+      <main class="admin-content">
+
+        <!-- New reading form -->
+        <section class="report-section">
+          <h2>Log a Reading</h2>
+          <form class="admin-form ft-form" id="ft-form">
+            <div class="admin-form__row">
+              <label class="admin-field">
+                <span>Fridge / Unit</span>
+                <input type="text" id="ft-unit" list="ft-unit-presets" placeholder="e.g. Main Fridge" autocomplete="off" required />
+                <datalist id="ft-unit-presets">
+                  <option value="Main Fridge"></option>
+                  <option value="Display Chiller"></option>
+                  <option value="Walk-in Fridge"></option>
+                  <option value="Walk-in Freezer"></option>
+                  <option value="Under-counter Fridge"></option>
+                  <option value="Prep Fridge"></option>
+                  <option value="Drinks Chiller"></option>
+                  <option value="Chest Freezer"></option>
+                </datalist>
+              </label>
+              <label class="admin-field">
+                <span>Type</span>
+                <select id="ft-type">
+                  <option value="fridge">Fridge / Chiller</option>
+                  <option value="freezer">Freezer</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="admin-form__row">
+              <label class="admin-field">
+                <span>Temperature (°C)</span>
+                <input type="number" id="ft-temp" step="0.1" placeholder="e.g. 3.5" required />
+                <span class="admin-field__hint">Safe: fridge ≤ 5°C · freezer ≤ -18°C</span>
+              </label>
+              <label class="admin-field">
+                <span>Date &amp; Time</span>
+                <input type="datetime-local" id="ft-reading-at" required />
+              </label>
+            </div>
+
+            <div class="admin-form__row">
+              <label class="admin-field">
+                <span>Staff (name / initials)</span>
+                <input type="text" id="ft-staff" placeholder="e.g. CG" autocomplete="off" required />
+              </label>
+              <label class="admin-field">
+                <span>Notes (optional)</span>
+                <input type="text" id="ft-notes" placeholder="e.g. after delivery restock" autocomplete="off" />
+              </label>
+            </div>
+
+            <div class="ft-form__actions">
+              <button type="submit" class="btn" id="ft-save-btn">Save Reading</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Log table + filter / export -->
+        <div class="report-range">
+          <div class="report-range__spacer"></div>
+          <div class="report-range__inputs">
+            <label class="report-range__field">
+              <span>From</span>
+              <input type="date" id="ft-from" />
+            </label>
+            <label class="report-range__field">
+              <span>To</span>
+              <input type="date" id="ft-to" />
+            </label>
+            <button id="ft-apply" class="btn">Apply</button>
+            <button id="ft-clear" class="btn btn--outline">Clear</button>
+            <button id="ft-export" class="btn btn--outline">Export CSV</button>
+          </div>
+        </div>
+
+        <section class="report-section">
+          <h2>Temperature Log</h2>
+          <div id="ft-table">
+            <p class="admin-table__empty">Loading…</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="../js/admin-fridge-temperatures.js"></script>
+</body>
+</html>

@@ -914,3 +914,57 @@ body.admin-login { background: var(--bg-deeper); }
   color: var(--cream);
   font-weight: 600;
 }
+
+/* =========================================================
+   FRIDGE TEMPERATURES PAGE
+   ========================================================= */
+.ft-form .btn { align-self: start; }
+.ft-form__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Temperature reading badge in the log table */
+.temp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.temp-badge--ok {
+  color: #b6d399;
+  border-color: rgba(182, 211, 153, 0.5);
+  background: rgba(90, 138, 58, 0.15);
+}
+.temp-badge--warn {
+  color: #f4b3a8;
+  border-color: rgba(244, 179, 168, 0.5);
+  background: rgba(198, 61, 47, 0.14);
+}
+
+/* Highlight an out-of-range reading row */
+.admin-table tbody tr.ft-row--warn { background: rgba(198, 61, 47, 0.07); }
+.admin-table tbody tr.ft-row--warn:hover { background: rgba(198, 61, 47, 0.12); }
+
+.ft-warn-flag {
+  display: inline-block;
+  margin-left: 0.4rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #f4b3a8;
+}
+
+.ft-unit-type {
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-transform: capitalize;
+}

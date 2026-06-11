@@ -53,3 +53,9 @@
   from = "/admin/production"
   to = "/admin/production.html"
   status = 200
+
+# Clean /admin/fridge-temperatures URL → fridge temperature log
+[[redirects]]
+  from = "/admin/fridge-temperatures"
+  to = "/admin/fridge-temperatures.html"
+  status = 200

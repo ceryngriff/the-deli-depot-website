@@ -485,6 +485,36 @@ on conflict (weekday, time_slot) do nothing;
 
 
 -- =========================================================
+-- 8. FRIDGE / CHILLER TEMPERATURE LOGS
+-- Staff log fridge & freezer temperatures as evidence for
+-- Environmental Health Officer (EHO) inspections. Admin-only.
+-- (Kept in sync with supabase/migrations/03-fridge-temperatures.sql.)
+-- =========================================================
+create table if not exists public.fridge_temperature_logs (
+  id            uuid primary key default gen_random_uuid(),
+  unit_name     text not null,                       -- e.g. 'Main Fridge', 'Display Chiller'
+  unit_type     text not null default 'fridge'
+                  check (unit_type in ('fridge','freezer')),
+  temperature_c numeric(4,1) not null,               -- reading in °C (allows negatives)
+  reading_at    timestamptz not null default now(),  -- when the reading was taken
+  staff_name    text not null,                       -- who took it (name or initials)
+  notes         text,
+  created_at    timestamptz not null default now()
+);
+
+create index if not exists fridge_temp_logs_reading_idx
+  on public.fridge_temperature_logs (reading_at desc);
+
+alter table public.fridge_temperature_logs enable row level security;
+
+drop policy if exists "fridge_temps_admin_all" on public.fridge_temperature_logs;
+create policy "fridge_temps_admin_all"
+  on public.fridge_temperature_logs
+  for all using (public.is_admin())
+  with check (public.is_admin());
+
+
+-- =========================================================
 -- STORAGE BUCKET FOR MEAL IMAGES
 -- =========================================================
 -- Public read so customer pages can show images via the URL.
