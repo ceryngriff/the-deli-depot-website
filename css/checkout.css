@@ -318,6 +318,21 @@
   margin-top: 0.5rem;
 }
 
+/* ---------- Stripe card element ---------- */
+/* The actual card inputs live inside a Stripe-hosted iframe (themed via the
+   Elements `appearance` API in js/checkout.js). This wrapper just gives it the
+   same dark "field" surround as the native inputs above. */
+.stripe-card-element {
+  background: var(--bg-deeper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  transition: border-color 0.2s ease;
+}
+.stripe-card-element.StripeElement--focus { border-color: var(--gold); }
+.stripe-card-element.StripeElement--invalid { border-color: #f4b3a8; }
+#stripe-card-errors:empty { display: none; }
+
 /* ---------- order confirmation ---------- */
 .confirmation-card {
   background: var(--bg-raised);

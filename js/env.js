@@ -15,3 +15,15 @@ window.SUPABASE_CONFIG = {
   url: 'https://wcfvnlntkhpnokrejljl.supabase.co',
   anonKey: 'sb_publishable_0-zClgevOpdbSC3T7HIXmg_LPgkW2VQ'
 };
+
+// =========================================================
+// STRIPE PUBLISHABLE KEY
+// =========================================================
+// Safe to expose in the browser (it can only create payments,
+// not read or refund them). REPLACE the placeholder below with
+// the real publishable key from:
+//   Stripe Dashboard → Developers → API keys  (pk_live_… / pk_test_…)
+// The matching SECRET key lives only in Netlify env vars
+// (STRIPE_SECRET_KEY) and is never committed here.
+// =========================================================
+window.STRIPE_PUBLISHABLE_KEY = 'pk_test_51TgxQ4HWS4ZKdiZAlyzbwZXliVtReO8LVR9zzeiwVGUAiOInRGJTNKkAk84hiQiSEEbaUb5yLTUJDo9TF8WN4gz100xj9s7G3W';

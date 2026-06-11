@@ -3,9 +3,11 @@
 // Collection slot picker + contact form + order creation.
 // Supports both signed-in users and guest checkout.
 //
-// TODO: Stripe integration — when phayments go live, add a
-// "Pay now" step between order insert and confirmation.
-// =================================h========================
+// Payment flow: place_order() inserts the order as 'unpaid', then we
+// create a Stripe PaymentIntent and confirm the card via Stripe Elements
+// before redirecting to the confirmation page. The stripe-webhook Netlify
+// Function flips the order to 'paid' server-side.
+// =========================================================
 
 import { supabase } from './supabase.js';
 import { getSession, getCurrentProfile } from './auth.js';
@@ -223,9 +225,103 @@ function withTimeout(promise, ms) {
   ]);
 }
 
+// ---------- STRIPE PAYMENT ----------
+// Card payments run AFTER the order row exists: place_order() inserts the
+// order as 'unpaid', then we create a Stripe PaymentIntent and confirm the
+// card here in the browser. The stripe-webhook Netlify Function is what
+// actually flips the order to 'paid' server-side — never trust the client.
+
+// State carried between the two clicks of the submit button:
+//   1st click → create order + PaymentIntent, reveal the card form
+//   2nd click → confirm the card payment
+let createdOrder   = null; // { order, itemRows, cachedOrder, subtotal } once place_order succeeds
+let pendingPayment = null; // { clientSecret } once the PaymentIntent + card form are ready
+let stripeInstance = null; // cached Stripe(pk) object
+let cardElement    = null; // mounted Stripe Elements card
+
+// Dark deli theme for Stripe Elements (cream/gold on near-black).
+const STRIPE_APPEARANCE = {
+  theme: 'night',
+  variables: {
+    colorPrimary:         '#c9a961',
+    colorBackground:      '#141312',
+    colorText:            '#f5f1e8',
+    colorTextSecondary:   '#a8a39a',
+    colorTextPlaceholder: '#6f6a62',
+    colorDanger:          '#f4b3a8',
+    fontFamily:           'Montserrat, system-ui, sans-serif',
+    borderRadius:         '8px'
+  }
+};
+// The combined `card` Element styles its text via the classic `style` option.
+const STRIPE_CARD_STYLE = {
+  base: {
+    color:        '#f5f1e8',
+    fontFamily:   'Montserrat, system-ui, sans-serif',
+    fontSize:     '16px',
+    iconColor:    '#c9a961',
+    '::placeholder': { color: '#6f6a62' }
+  },
+  invalid: { color: '#f4b3a8', iconColor: '#f4b3a8' }
+};
+
+// Returns the configured publishable key, or null if it's missing/placeholder.
+function getStripeKey() {
+  const key = window.STRIPE_PUBLISHABLE_KEY;
+  if (!key || key === 'pk_live_REPLACE_ME') return null;
+  return key;
+}
+
+// Inject Stripe.js from the CDN once (no bundler here). Resolves when ready.
+function loadStripeJs() {
+  return new Promise((resolve, reject) => {
+    if (window.Stripe) return resolve();
+    const existing = document.querySelector('script[data-stripe-js]');
+    if (existing) {
+      existing.addEventListener('load', () => resolve());
+      existing.addEventListener('error', () => reject(new Error('Could not load Stripe.js')));
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = 'https://js.stripe.com/v3/';
+    s.async = true;
+    s.dataset.stripeJs = 'true';
+    s.onload  = () => resolve();
+    s.onerror = () => reject(new Error('Could not load Stripe.js'));
+    document.head.appendChild(s);
+  });
+}
+
+// Build the Stripe instance + card Element and mount it into the page (once).
+async function mountCardElement(key) {
+  await loadStripeJs();
+  if (!stripeInstance) stripeInstance = window.Stripe(key);
+  if (!cardElement) {
+    const elements = stripeInstance.elements({ appearance: STRIPE_APPEARANCE });
+    cardElement = elements.create('card', { style: STRIPE_CARD_STYLE });
+    cardElement.mount('#stripe-card-element');
+    // Surface inline validation errors as the customer types.
+    const errBox = document.getElementById('stripe-card-errors');
+    cardElement.on('change', (ev) => {
+      if (errBox) errBox.textContent = ev.error ? ev.error.message : '';
+    });
+  }
+}
+
 // ---------- PLACE ORDER ----------
 
+// Submit dispatcher: first press creates the order + card form, second press
+// (once the card form is showing) confirms the payment. Guarding on
+// pendingPayment is what prevents a duplicate order on the pay step.
 async function placeOrder() {
+  if (pendingPayment) {
+    await confirmPayment();
+  } else {
+    await createOrderAndShowPayment();
+  }
+}
+
+async function createOrderAndShowPayment() {
   hideError();
   const form = document.getElementById('checkout-form');
   if (!form) return;
@@ -254,6 +350,14 @@ async function placeOrder() {
     return;
   }
 
+  // Check card payments are configured BEFORE we create an order — otherwise
+  // we'd leave an unpaid order that can never be settled.
+  const stripeKey = getStripeKey();
+  if (!stripeKey) {
+    showError('Card payments aren\'t set up yet. Please contact the deli to place your order.');
+    return;
+  }
+
   // Re-check capacity at submit time (another customer could have filled
   // this slot while we were on the page). Fail OPEN: if the lookup throws or
   // times out (Supabase slow/unreachable), let the order through rather than
@@ -278,7 +382,7 @@ async function placeOrder() {
   const submitBtn = document.getElementById('place-order-btn');
   if (submitBtn) {
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Placing order…';
+    submitBtn.textContent = 'Creating order…';
   }
 
   // Build the line items for the order.
@@ -304,47 +408,151 @@ async function placeOrder() {
   // (who have no auth identity) create their own order without tripping the
   // owner-scoped Row Level Security policies — and returns the new order
   // number so we don't need a separate, RLS-blocked read-back.
-  let order, orderErr;
-  try {
-    ({ data: order, error: orderErr } = await withTimeout(
-      supabase.rpc('place_order', {
-        p_email:          email,
-        p_name:           fullName,
-        p_phone:          phone,
-        p_collection_slot: collectionDateTime.toISOString(),
-        p_subtotal:       subtotal,
-        p_total:          subtotal,
-        p_notes:          notes || null,
-        p_items:          itemRows
-      }).single(),
-      12000
-    ));
-  } catch (e) {
-    orderErr = e; // timeout or network rejection
+  //
+  // Reuse an order from an earlier attempt (e.g. the PaymentIntent call failed
+  // and the customer pressed the button again) so we never create duplicates.
+  if (!createdOrder) {
+    let order, orderErr;
+    try {
+      ({ data: order, error: orderErr } = await withTimeout(
+        supabase.rpc('place_order', {
+          p_email:          email,
+          p_name:           fullName,
+          p_phone:          phone,
+          p_collection_slot: collectionDateTime.toISOString(),
+          p_subtotal:       subtotal,
+          p_total:          subtotal,
+          p_notes:          notes || null,
+          p_items:          itemRows
+        }).single(),
+        12000
+      ));
+    } catch (e) {
+      orderErr = e; // timeout or network rejection
+    }
+
+    if (orderErr || !order) {
+      console.error('[checkout] place_order', orderErr);
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Place Order'; }
+      showError(`We couldn't place your order: ${orderErr?.message || 'Unknown error'}. Please try again.`);
+      return;
+    }
+
+    // Cache the order details so the confirmation page can show them even for
+    // guests (RLS won't let anon read their own orders back). Stays 'unpaid'
+    // here — we re-stamp it 'paid' after the card is confirmed.
+    const cachedOrder = {
+      id:              order.id,
+      order_number:    order.order_number,
+      customer_name:   fullName,
+      customer_email:  email,
+      customer_phone:  phone,
+      status:          'pending',
+      collection_slot: collectionDateTime.toISOString(),
+      subtotal:        subtotal,
+      total:           subtotal,
+      notes:           notes || null,
+      payment_status:  'unpaid'
+    };
+    createdOrder = { order, itemRows, cachedOrder, subtotal, fullName, email };
   }
 
-  if (orderErr || !order) {
-    console.error('[checkout] place_order', orderErr);
+  // 2. Create the Stripe PaymentIntent for this order's total.
+  const { order, cachedOrder } = createdOrder;
+  let clientSecret;
+  try {
+    const resp = await withTimeout(fetch('/.netlify/functions/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        orderId:       order.id,
+        orderNumber:   order.order_number,
+        amountPence:   Math.round(subtotal * 100),
+        customerEmail: email,
+        customerName:  fullName
+      })
+    }), 12000);
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok || !data.clientSecret) {
+      throw new Error(data.error || `Payment setup failed (${resp.status})`);
+    }
+    clientSecret = data.clientSecret;
+  } catch (e) {
+    console.error('[checkout] create-payment-intent', e);
     if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Place Order'; }
-    showError(`We couldn't place your order: ${orderErr?.message || 'Unknown error'}. Please try again.`);
+    showError(`We couldn't start the payment: ${e.message || 'Unknown error'}. Your order is saved — please try again.`);
     return;
   }
 
-  // 2. Cache the order details so the confirmation page can show them
-  // even for guests (RLS won't let anon read their own orders back).
-  const cachedOrder = {
-    id:              order.id,
-    order_number:    order.order_number,
-    customer_name:   fullName,
-    customer_email:  email,
-    customer_phone:  phone,
-    status:          'pending',
-    collection_slot: collectionDateTime.toISOString(),
-    subtotal:        subtotal,
-    total:           subtotal,
-    notes:           notes || null,
-    payment_status:  'unpaid'
-  };
+  // 3. Load Stripe.js + mount the card form, then reveal the payment section.
+  try {
+    await mountCardElement(stripeKey);
+  } catch (e) {
+    console.error('[checkout] Stripe.js / Elements', e);
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Place Order'; }
+    showError('We couldn\'t load the secure card form. Please refresh and try again.');
+    return;
+  }
+
+  const paySection = document.getElementById('stripe-payment-section');
+  if (paySection) {
+    paySection.hidden = false;
+    paySection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  if (cardElement) cardElement.focus();
+
+  pendingPayment = { clientSecret };
+
+  // Hand off to the pay step — the next button press confirms the card.
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.textContent = `Pay £${subtotal.toFixed(2)}`;
+  }
+}
+
+// ---------- CONFIRM CARD PAYMENT ----------
+
+async function confirmPayment() {
+  hideError();
+  if (!pendingPayment || !createdOrder || !cardElement || !stripeInstance) return;
+
+  const { clientSecret } = pendingPayment;
+  const { order, itemRows, cachedOrder, subtotal, fullName, email } = createdOrder;
+
+  const submitBtn = document.getElementById('place-order-btn');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Processing payment…';
+  }
+
+  let result;
+  try {
+    result = await stripeInstance.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: cardElement,
+        billing_details: { name: fullName, email }
+      }
+    });
+  } catch (e) {
+    result = { error: { message: e.message || 'Payment could not be processed.' } };
+  }
+
+  if (result.error) {
+    // Payment failed — keep the order + PaymentIntent so the customer can
+    // simply correct their card and try again (no duplicate order).
+    const msg = result.error.message || 'Your card could not be charged.';
+    const cardErr = document.getElementById('stripe-card-errors');
+    if (cardErr) cardErr.textContent = msg;
+    showError(msg);
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = `Pay £${subtotal.toFixed(2)}`; }
+    return;
+  }
+
+  // Payment succeeded. The stripe-webhook function will flip the order to
+  // 'paid' server-side; update our cached copy so the confirmation page
+  // reflects it immediately.
+  cachedOrder.payment_status = 'paid';
+  cachedOrder.status = 'confirmed';
   try {
     sessionStorage.setItem('dd_last_order', JSON.stringify({
       order: cachedOrder,
@@ -353,14 +561,13 @@ async function placeOrder() {
     }));
   } catch (e) { /* sessionStorage might be unavailable */ }
 
-  // 3. Fire-and-forget confirmation email (non-blocking).
-  // Endpoint only exists on the Netlify-deployed site — locally
-  // this will 404 / network-error and we log + move on.
+  // Fire-and-forget confirmation email (non-blocking). Endpoint only exists on
+  // the Netlify-deployed site — locally this 404s and we log + move on.
   sendConfirmationEmail(cachedOrder, itemRows).catch((err) => {
     console.warn('[checkout] confirmation email did not send:', err);
   });
 
-  // 5. Empty the basket and redirect
+  // Empty the basket and redirect.
   basket.clearBasket();
   window.location.href = `order-confirmation.html?order=${encodeURIComponent(order.order_number)}`;
 }

@@ -47,6 +47,15 @@ function render({ order, items }) {
   document.getElementById('order-customer').textContent = order.customer_name || '—';
   document.getElementById('order-total').textContent = `£${parseFloat(order.total).toFixed(2)}`;
 
+  // Payment status (capitalised) when the cached/DB order carries it.
+  const paymentEl = document.getElementById('order-payment');
+  if (paymentEl) {
+    const ps = order.payment_status;
+    paymentEl.textContent = ps
+      ? ps.charAt(0).toUpperCase() + ps.slice(1)
+      : 'On collection';
+  }
+
   const list = document.getElementById('order-items');
   list.innerHTML = items.map((i) => `
     <li>
