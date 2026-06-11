@@ -5,8 +5,6 @@
 // window.MealPrepBasket exposed by basket.js.
 // =========================================================
 
-import { supabase } from './supabase.js';
-
 let allMeals = [];
 let filteredMeals = [];
 const state = {
@@ -17,48 +15,75 @@ const state = {
 };
 
 // ---------- DATA ----------
+// Hard-coded weekly menu. This is the source of truth for the menu grid —
+// no network/Supabase call, so the page always renders. To change the menu,
+// edit the MENU array below (keep it in sync with data/meal-prep-menu.json).
 
-// Map a Supabase `meals` row into the shape the rest of this file expects.
-function shapeMeal(row) {
-  return {
-    id: row.id,
-    slug: row.slug,
-    name: row.name,
-    tagline: row.tagline || '',
-    category: row.category || 'signature',
-    description: row.description || '',
-    image: row.image_url || '',
-    macros: {
-      kcal: row.kcal ?? 0,
-      protein: row.protein_g ?? 0,
-      carbs: row.carbs_g ?? 0,
-      fat: row.fat_g ?? 0
-    },
-    price_single: parseFloat(row.price_single ?? 0),
-    price_bundle_5: parseFloat(row.price_bundle_5 ?? 0),
-    price_bundle_10: parseFloat(row.price_bundle_10 ?? 0),
-    tags: row.tags || [],
-    protein_source: row.protein_source || '',
-    goal: row.goal_tags || [],
-    new_this_week: !!row.new_this_week,
-    sort_order: row.sort_order ?? 0
-  };
-}
-
-async function loadMenuData() {
-  const { data, error } = await supabase
-    .from('meals')
-    .select('*')
-    .eq('is_active', true)
-    .order('sort_order', { ascending: true })
-    .order('name', { ascending: true });
-
-  if (error) {
-    console.error('[menu] load error', error);
-    showError('Unable to load menu. Please refresh the page.');
-    return null;
+const MENU = [
+  {
+    id: 'powerhouse', slug: 'powerhouse', name: 'The Powerhouse',
+    tagline: 'Piri Piri Chicken · Basmati · Tenderstem', category: 'signature',
+    description: 'Marinated grilled chicken breast over fluffy basmati rice, finished with charred tenderstem broccoli and roasted peppers. Smoky, lean and built to fuel a heavy training session.',
+    image: 'assets/meals/powerhouse.webp',
+    macros: { kcal: 485, protein: 52, carbs: 38, fat: 12 },
+    price_single: 7.50, price_bundle_5: 33.50, price_bundle_10: 64.00,
+    tags: ['high-protein', 'gluten-free', 'lean'], protein_source: 'chicken',
+    goal: ['lean', 'maintenance'], new_this_week: true, sort_order: 1
+  },
+  {
+    id: 'beef-spud', slug: 'beef-spud', name: 'Beef & Sweet Spud',
+    tagline: 'Slow-braised beef, sweet potato, kale', category: 'signature',
+    description: 'Tender braised beef chuck steak with roasted sweet potato wedges, massaged kale and a rich beefy jus. Perfect for bulking season or weekend energy.',
+    image: 'assets/meals/beef-spud.webp',
+    macros: { kcal: 620, protein: 48, carbs: 58, fat: 18 },
+    price_single: 8.00, price_bundle_5: 36.00, price_bundle_10: 68.00,
+    tags: ['high-protein', 'bulk'], protein_source: 'beef',
+    goal: ['bulk', 'maintenance'], new_this_week: false, sort_order: 2
+  },
+  {
+    id: 'honey-salmon', slug: 'honey-salmon', name: 'Honey Glazed Salmon',
+    tagline: 'Salmon, jasmine rice, edamame slaw', category: 'signature',
+    description: 'Pan-seared salmon fillet with a light honey and soy glaze, served on fluffy jasmine rice with a crisp edamame and sesame slaw. Omega-3 packed and restaurant quality.',
+    image: 'assets/meals/honey-salmon.webp',
+    macros: { kcal: 540, protein: 42, carbs: 44, fat: 16 },
+    price_single: 9.00, price_bundle_5: 40.50, price_bundle_10: 77.00,
+    tags: ['high-protein', 'omega-3', 'lean'], protein_source: 'salmon',
+    goal: ['lean', 'maintenance'], new_this_week: false, sort_order: 3
+  },
+  {
+    id: 'halloumi-couscous', slug: 'halloumi-couscous', name: 'Halloumi & Couscous',
+    tagline: 'Griddled halloumi, lemon couscous, med veg', category: 'signature',
+    description: 'Squeaky-fresh halloumi cheese griddled until golden, with fluffy lemon couscous and a medley of roasted Mediterranean vegetables. Vegetarian crowd-pleaser.',
+    image: 'assets/meals/halloumi-couscous.webp',
+    macros: { kcal: 510, protein: 26, carbs: 48, fat: 22 },
+    price_single: 7.00, price_bundle_5: 31.50, price_bundle_10: 60.00,
+    tags: ['vegetarian', 'mediterranean'], protein_source: 'plant-based',
+    goal: ['lean', 'maintenance'], new_this_week: true, sort_order: 4
+  },
+  {
+    id: 'tikka-chicken', slug: 'tikka-chicken', name: 'Tikka Chicken Bowl',
+    tagline: 'Tandoori chicken, cauli rice, raita', category: 'signature',
+    description: 'Spiced tandoori chicken thighs with cauliflower rice, cooling natural yogurt raita and toasted cumin seeds. Low-carb, high-protein, and deeply aromatic.',
+    image: 'assets/meals/tikka-chicken.webp',
+    macros: { kcal: 395, protein: 46, carbs: 14, fat: 15 },
+    price_single: 7.50, price_bundle_5: 33.50, price_bundle_10: 64.00,
+    tags: ['high-protein', 'low-carb', 'under-500-kcal', 'gluten-free'], protein_source: 'chicken',
+    goal: ['lean', 'maintenance'], new_this_week: false, sort_order: 5
+  },
+  {
+    id: 'banana-oats', slug: 'banana-oats', name: 'Banana Protein Oats',
+    tagline: 'Overnight oats, whey, banana, almond butter', category: 'breakfast',
+    description: 'Creamy overnight oats blended with whey protein powder, topped with sliced banana, almond butter, granola crunch and a drizzle of honey. Grab-and-go breakfast fuel.',
+    image: 'assets/meals/banana-oats.jpg',
+    macros: { kcal: 420, protein: 32, carbs: 52, fat: 10 },
+    price_single: 4.50, price_bundle_5: 20.00, price_bundle_10: 38.00,
+    tags: ['breakfast', 'high-protein', 'vegetarian', 'under-500-kcal'], protein_source: 'plant-based',
+    goal: ['maintenance'], new_this_week: false, sort_order: 6
   }
-  allMeals = (data || []).map(shapeMeal);
+];
+
+function loadMenuData() {
+  allMeals = MENU.map((m) => ({ ...m }));
   filteredMeals = [...allMeals];
   return allMeals;
 }
@@ -270,11 +295,9 @@ function escapeHtml(str) {
 
 // ---------- INIT ----------
 
-(async function init() {
-  const data = await loadMenuData();
-  if (data) {
-    renderCards(filteredMeals);
-    updateFilterCounts();
-    setupEventListeners();
-  }
+(function init() {
+  loadMenuData();
+  renderCards(filteredMeals);
+  updateFilterCounts();
+  setupEventListeners();
 })();

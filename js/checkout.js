@@ -298,7 +298,9 @@ async function mountCardElement(key) {
   if (!stripeInstance) stripeInstance = window.Stripe(key);
   if (!cardElement) {
     const elements = stripeInstance.elements({ appearance: STRIPE_APPEARANCE });
-    cardElement = elements.create('card', { style: STRIPE_CARD_STYLE });
+    // hidePostalCode: collection-only service — we don't need a billing
+    // postcode, and the field otherwise blocks customers who leave it blank.
+    cardElement = elements.create('card', { style: STRIPE_CARD_STYLE, hidePostalCode: true });
     cardElement.mount('#stripe-card-element');
     // Surface inline validation errors as the customer types.
     const errBox = document.getElementById('stripe-card-errors');
