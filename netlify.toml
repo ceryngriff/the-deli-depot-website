@@ -59,3 +59,9 @@
   from = "/admin/fridge-temperatures"
   to = "/admin/fridge-temperatures.html"
   status = 200
+
+# Clean /admin/opening-closing-checks URL → opening & closing checks
+[[redirects]]
+  from = "/admin/opening-closing-checks"
+  to = "/admin/opening-closing-checks.html"
+  status = 200

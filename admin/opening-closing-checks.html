@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Opening &amp; Closing Checks | Admin | The Deli Depot</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/account.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+
+  <script src="../js/env.js"></script>
+</head>
+<body class="admin">
+
+  <div class="admin-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" aria-label="Admin navigation">
+      <a href="/admin/index.html" class="admin-sidebar__brand">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+        <span class="admin-sidebar__label">Admin</span>
+      </a>
+      <nav class="admin-nav" aria-label="Sections">
+        <a href="/admin/index.html">Dashboard</a>
+        <a href="/admin/menu.html">Menu</a>
+        <a href="/admin/orders.html">
+          Orders <span class="admin-nav__badge" data-pending-count hidden>0</span>
+        </a>
+        <a href="/admin/subscriptions.html">Subscriptions</a>
+        <a href="/admin/production.html">Production</a>
+        <a href="/admin/reports.html">Reports</a>
+        <a href="/admin/fridge-temperatures.html">Fridge Temps</a>
+        <a href="/admin/opening-closing-checks.html" class="is-active">Opening &amp; Closing Checks</a>
+      </nav>
+      <div class="admin-sidebar__bottom">
+        <nav class="admin-nav" aria-label="Account">
+          <a href="/index.html">Back to Site</a>
+          <a href="#" data-sign-out>Sign Out</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="admin-main">
+
+      <header class="admin-topbar">
+        <button class="admin-topbar__toggle" data-sidebar-toggle aria-label="Open menu">☰</button>
+        <h1 class="admin-topbar__title">Opening &amp; Closing Checks</h1>
+        <span class="admin-topbar__greeting">Hi, <span data-admin-greeting>Admin</span></span>
+      </header>
+
+      <main class="admin-content">
+
+        <!-- Tabs -->
+        <div class="admin-tabs" role="tablist" aria-label="Check type">
+          <button class="admin-tab is-active" data-tab="opening" role="tab" aria-selected="true">Opening Check</button>
+          <button class="admin-tab" data-tab="closing" role="tab" aria-selected="false">Closing Check</button>
+        </div>
+
+        <!-- ============ OPENING PANEL ============ -->
+        <section class="oc-panel" data-panel="opening">
+
+          <section class="report-section">
+            <h2>New Opening Check</h2>
+            <form class="admin-form" id="opening-form">
+              <div class="admin-form__row">
+                <label class="admin-field">
+                  <span>Date &amp; Time</span>
+                  <input type="datetime-local" id="opening-when" required />
+                </label>
+                <label class="admin-field">
+                  <span>Staff (name / initials)</span>
+                  <input type="text" id="opening-staff" placeholder="e.g. CG" autocomplete="off" required />
+                </label>
+              </div>
+
+              <div class="check-list">
+                <div class="check-item" data-key="surfaces_clean">
+                  <span class="check-item__label">Surfaces and equipment clean and ready</span>
+                  <div class="check-toggle">
+                    <label class="check-toggle__opt"><input type="radio" name="op-surfaces_clean" value="yes" checked /><span>Yes</span></label>
+                    <label class="check-toggle__opt"><input type="radio" name="op-surfaces_clean" value="no" /><span>No</span></label>
+                  </div>
+                </div>
+                <div class="check-item" data-key="date_labels_ok">
+                  <span class="check-item__label">Date labels in order / no out-of-date stock</span>
+                  <div class="check-toggle">
+                    <label class="check-toggle__opt"><input type="radio" name="op-date_labels_ok" value="yes" checked /><span>Yes</span></label>
+                    <label class="check-toggle__opt"><input type="radio" name="op-date_labels_ok" value="no" /><span>No</span></label>
+                  </div>
+                </div>
+                <div class="check-item" data-key="handwash_stocked">
+                  <span class="check-item__label">Handwashing station stocked — soap &amp; paper towels</span>
+                  <div class="check-toggle">
+                    <label class="check-toggle__opt"><input type="radio" name="op-handwash_stocked" value="yes" checked /><span>Yes</span></label>
+                    <label class="check-toggle__opt"><input type="radio" name="op-handwash_stocked" value="no" /><span>No</span></label>
+                  </div>
+                </div>
+                <div class="check-item" data-key="pest_check_ok">
+                  <span class="check-item__label">Pest check — no signs of overnight activity</span>
+                  <div class="check-toggle">
+                    <label class="check-toggle__opt"><input type="radio" name="op-pest_check_ok" value="yes" checked /><span>Yes</span></label>
+                    <label class="check-toggle__opt"><input type="radio" name="op-pest_check_ok" value="no" /><span>No</span></label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="admin-field">
+                <span>Fridge / Freezer Temperatures</span>
+                <div class="temp-rows" id="opening-temps"></div>
+                <button type="button" class="btn btn--outline oc-add-temp" data-add-temp="opening">+ Add temperature</button>
+              </div>
+
+              <label class="admin-field">
+                <span>Notes / Issues (optional)</span>
+                <textarea id="opening-notes" placeholder="Anything that needs flagging or following up…"></textarea>
+              </label>
+
+              <div class="ft-form__actions">
+                <button type="submit" class="btn" id="opening-save-btn">Submit Opening Check</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="report-section">
+            <div class="oc-history-head">
+              <h2>Opening Check History</h2>
+              <button class="btn btn--outline" data-export="opening">Export CSV</button>
+            </div>
+            <div id="opening-history">
+              <p class="admin-table__empty">Loading…</p>
+            </div>
+          </section>
+
+        </section>
+
+        <!-- ============ CLOSING PANEL ============ -->
+        <section class="oc-panel" data-panel="closing" hidden>
+
+          <section class="report-section">
+            <h2>New Closing Check</h2>
+            <form class="admin-form" id="closing-form">
+              <div class="admin-form__row">
+                <label class="admin-field">
+                  <span>Date &amp; Time</span>
+                  <input type="datetime-local" id="closing-when" required />
+                </label>
+                <label class="admin-field">
+                  <span>Staff (name / initials)</span>
+                  <input type="text" id="closing-staff" placeholder="e.g. CG" autocomplete="off" required />
+                </label>
+              </div>
+
+              <div class="check-list">
+                <div class="check-item" data-key="food_covered">
+                  <span class="check-item__label">All food covered and stored correctly</span>
+                  <div class="check-toggle">
+                    <label class="check-toggle__opt"><input type="radio" name="cl-food_covered" value="yes" checked /><span>Yes</span></label>
+                    <label class="check-toggle__opt"><input type="radio" name="cl-food_covered" value="no" /><span>No</span></label>
+                  </div>
+                </div>
+                <div class="check-item" data-key="surfaces_cleaned">
+                  <span class="check-item__label">Surfaces cleaned down</span>
+                  <div class="check-toggle">
+                    <label class="check-toggle__opt"><input type="radio" name="cl-surfaces_cleaned" value="yes" checked /><span>Yes</span></label>
+                    <label class="check-toggle__opt"><input type="radio" name="cl-surfaces_cleaned" value="no" /><span>No</span></label>
+                  </div>
+                </div>
+                <div class="check-item" data-key="bins_emptied">
+                  <span class="check-item__label">Bins emptied</span>
+                  <div class="check-toggle">
+                    <label class="check-toggle__opt"><input type="radio" name="cl-bins_emptied" value="yes" checked /><span>Yes</span></label>
+                    <label class="check-toggle__opt"><input type="radio" name="cl-bins_emptied" value="no" /><span>No</span></label>
+                  </div>
+                </div>
+                <div class="check-item" data-key="equipment_off">
+                  <span class="check-item__label">Equipment switched off / locked down</span>
+                  <div class="check-toggle">
+                    <label class="check-toggle__opt"><input type="radio" name="cl-equipment_off" value="yes" checked /><span>Yes</span></label>
+                    <label class="check-toggle__opt"><input type="radio" name="cl-equipment_off" value="no" /><span>No</span></label>
+                  </div>
+                </div>
+                <div class="check-item" data-key="doors_secured">
+                  <span class="check-item__label">Doors and windows secured</span>
+                  <div class="check-toggle">
+                    <label class="check-toggle__opt"><input type="radio" name="cl-doors_secured" value="yes" checked /><span>Yes</span></label>
+                    <label class="check-toggle__opt"><input type="radio" name="cl-doors_secured" value="no" /><span>No</span></label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="admin-field">
+                <span>Fridge / Freezer Temperatures</span>
+                <div class="temp-rows" id="closing-temps"></div>
+                <button type="button" class="btn btn--outline oc-add-temp" data-add-temp="closing">+ Add temperature</button>
+              </div>
+
+              <label class="admin-field">
+                <span>Notes / Issues (optional)</span>
+                <textarea id="closing-notes" placeholder="Anything that needs flagging or following up…"></textarea>
+              </label>
+
+              <div class="ft-form__actions">
+                <button type="submit" class="btn" id="closing-save-btn">Submit Closing Check</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="report-section">
+            <div class="oc-history-head">
+              <h2>Closing Check History</h2>
+              <button class="btn btn--outline" data-export="closing">Export CSV</button>
+            </div>
+            <div id="closing-history">
+              <p class="admin-table__empty">Loading…</p>
+            </div>
+          </section>
+
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Shared presets for the unit-name fields -->
+  <datalist id="oc-unit-presets">
+    <option value="Main Fridge"></option>
+    <option value="Display Chiller"></option>
+    <option value="Walk-in Fridge"></option>
+    <option value="Walk-in Freezer"></option>
+    <option value="Under-counter Fridge"></option>
+    <option value="Prep Fridge"></option>
+    <option value="Drinks Chiller"></option>
+    <option value="Chest Freezer"></option>
+  </datalist>
+
+  <!-- Template for a repeatable temperature row -->
+  <template id="temp-row-template">
+    <div class="temp-row">
+      <input type="text" class="temp-row__unit" list="oc-unit-presets" placeholder="Unit name" autocomplete="off" />
+      <select class="temp-row__type">
+        <option value="fridge">Fridge / Chiller</option>
+        <option value="freezer">Freezer</option>
+      </select>
+      <input type="number" class="temp-row__temp" step="0.1" placeholder="°C" />
+      <button type="button" class="temp-row__remove" aria-label="Remove row">×</button>
+    </div>
+  </template>
+
+  <script type="module" src="../js/admin-opening-closing-checks.js"></script>
+</body>
+</html>

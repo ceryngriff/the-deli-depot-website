@@ -515,6 +515,80 @@ create policy "fridge_temps_admin_all"
 
 
 -- =========================================================
+-- 9. OPENING & CLOSING DAILY CHECKS
+-- Staff record opening / closing food-safety checks (plus the
+-- fridge & freezer temperatures taken at the same time) as EHO
+-- evidence. Admin-only.
+-- (Kept in sync with supabase/migrations/04-opening-closing-checks.sql.)
+-- =========================================================
+create table if not exists public.opening_checks (
+  id               uuid primary key default gen_random_uuid(),
+  checked_at       timestamptz not null default now(),
+  staff_name       text not null,
+  surfaces_clean   boolean not null default false,
+  date_labels_ok   boolean not null default false,
+  handwash_stocked boolean not null default false,
+  pest_check_ok    boolean not null default false,
+  notes            text,
+  created_at       timestamptz not null default now()
+);
+
+create table if not exists public.closing_checks (
+  id               uuid primary key default gen_random_uuid(),
+  checked_at       timestamptz not null default now(),
+  staff_name       text not null,
+  food_covered     boolean not null default false,
+  surfaces_cleaned boolean not null default false,
+  bins_emptied     boolean not null default false,
+  equipment_off    boolean not null default false,
+  doors_secured    boolean not null default false,
+  notes            text,
+  created_at       timestamptz not null default now()
+);
+
+create table if not exists public.check_temperature_readings (
+  id               uuid primary key default gen_random_uuid(),
+  opening_check_id uuid references public.opening_checks(id) on delete cascade,
+  closing_check_id uuid references public.closing_checks(id) on delete cascade,
+  unit_name        text not null,
+  unit_type        text not null default 'fridge'
+                     check (unit_type in ('fridge','freezer')),
+  temperature_c    numeric(4,1) not null,
+  created_at       timestamptz not null default now(),
+  constraint check_temp_one_parent check (
+    (opening_check_id is not null)::int + (closing_check_id is not null)::int = 1
+  )
+);
+
+create index if not exists check_temp_opening_idx
+  on public.check_temperature_readings (opening_check_id);
+create index if not exists check_temp_closing_idx
+  on public.check_temperature_readings (closing_check_id);
+
+alter table public.opening_checks             enable row level security;
+alter table public.closing_checks             enable row level security;
+alter table public.check_temperature_readings enable row level security;
+
+drop policy if exists "opening_checks_admin_all" on public.opening_checks;
+create policy "opening_checks_admin_all"
+  on public.opening_checks
+  for all using (public.is_admin())
+  with check (public.is_admin());
+
+drop policy if exists "closing_checks_admin_all" on public.closing_checks;
+create policy "closing_checks_admin_all"
+  on public.closing_checks
+  for all using (public.is_admin())
+  with check (public.is_admin());
+
+drop policy if exists "check_temps_admin_all" on public.check_temperature_readings;
+create policy "check_temps_admin_all"
+  on public.check_temperature_readings
+  for all using (public.is_admin())
+  with check (public.is_admin());
+
+
+-- =========================================================
 -- STORAGE BUCKET FOR MEAL IMAGES
 -- =========================================================
 -- Public read so customer pages can show images via the URL.
