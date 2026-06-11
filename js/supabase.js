@@ -44,10 +44,12 @@ export const supabase = createClient(
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true
-    }
+    },
+        global: { fetch: window.fetch.bind(window) }
   }
 );
 
 // Convenience: expose the client on window for ad-hoc console debugging.
 // (window.supabase is the library namespace; the client is window.__supabase.)
+    global: { fetch: window.fetch.bind(window) }
 window.__supabase = supabase;
