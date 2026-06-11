@@ -51,6 +51,7 @@ export const supabase = createClient(
 
 // Convenience: expose the client on window for ad-hoc console debugging.
 // (window.supabase is the library namespace; the client is window.__supabase.)
+if (config) { supabase.rest.headers['apikey'] = config.anonKey; supabase.rest.headers['Authorization'] = `Bearer ${config.anonKey}`; }
     
 window.__supabase = supabase;
 supabase.rest.fetch = window.fetch.bind(window);
