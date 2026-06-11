@@ -51,5 +51,6 @@ export const supabase = createClient(
 
 // Convenience: expose the client on window for ad-hoc console debugging.
 // (window.supabase is the library namespace; the client is window.__supabase.)
-    global: { fetch: window.fetch.bind(window) }
+    
 window.__supabase = supabase;
+supabase.rest.fetch = window.fetch.bind(window);
