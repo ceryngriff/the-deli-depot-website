@@ -218,7 +218,13 @@ function renderStepPickMeals() {
     </div>
   `;
   contentEl.querySelectorAll('.sub-meal').forEach((card) => {
-    card.addEventListener('click', () => toggleMealSelection(card.dataset.id));
+    card.addEventListener('click', (e) => {
+      // The card is a <label> wrapping a checkbox. Without this, clicking the
+      // label fires once for the label and again for the forwarded checkbox
+      // click — toggling the meal twice and leaving the selection unchanged.
+      e.preventDefault();
+      toggleMealSelection(card.dataset.id);
+    });
   });
 }
 
