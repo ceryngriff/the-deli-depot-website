@@ -74,7 +74,7 @@ const MENU = [
     id: 'banana-oats', slug: 'banana-oats', name: 'Banana Protein Oats',
     tagline: 'Overnight oats, whey, banana, almond butter', category: 'breakfast',
     description: 'Creamy overnight oats blended with whey protein powder, topped with sliced banana, almond butter, granola crunch and a drizzle of honey. Grab-and-go breakfast fuel.',
-    image: 'assets/meals/banana-oats.jpg',
+    image: 'assets/meals/banana-oats.webp',
     macros: { kcal: 420, protein: 32, carbs: 52, fat: 10 },
     price_single: 4.50, price_bundle_5: 20.00, price_bundle_10: 38.00,
     tags: ['breakfast', 'high-protein', 'vegetarian', 'under-500-kcal'], protein_source: 'plant-based',
@@ -159,7 +159,11 @@ function addToBasketFromCard(meal, btn) {
   if (!window.MealPrepBasket) return;
   window.MealPrepBasket.addToBasket({
     id: meal.slug,
-    meal_id: meal.id,
+    // The menu grid uses the hard-coded local MENU, whose ids are text slugs
+    // (e.g. 'powerhouse'), not DB UUIDs. order_items.meal_id is a uuid, so
+    // sending the slug makes place_order's ::uuid cast throw and fails the
+    // whole order. Send null; the product page (meal.js) supplies the real id.
+    meal_id: null,
     slug: meal.slug,
     name: meal.name,
     price: meal.price_single,

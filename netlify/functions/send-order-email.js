@@ -14,6 +14,8 @@
 // gracefully (logs a warning, doesn't block order creation).
 // =========================================================
 
+const { createClient } = require('@supabase/supabase-js');
+
 // FROM defaults to the deli's own domain (needs that domain verified in
 // Resend). For a quick start before DNS is set up, set EMAIL_FROM in Netlify
 // to 'Deli Depot <onboarding@resend.dev>' — Resend's test sender, which can
@@ -21,13 +23,25 @@
 const FROM_ADDRESS = process.env.EMAIL_FROM || 'Deli Depot <orders@thedelidepot.com>';
 const REPLY_TO     = 'hello@thedelidepot.com';
 
-exports.handler = async (event) => {
-  // Allow same-origin POST + CORS preflight from the deployed site
-  const corsHeaders = {
-    'Access-Control-Allow-Origin':  '*',
+// Reflect the request Origin only if allow-listed; otherwise pin to the
+// primary domain. Stops arbitrary sites driving our Resend account.
+function corsHeadersFor(event) {
+  const allowed = (process.env.ALLOWED_ORIGIN ||
+    'https://thedelidepot.com,https://www.thedelidepot.com')
+    .split(',').map((s) => s.trim()).filter(Boolean);
+  const origin = event.headers.origin || event.headers.Origin || '';
+  const allow = allowed.includes(origin) ? origin
+    : (origin.endsWith('.netlify.app') ? origin : allowed[0]);
+  return {
+    'Access-Control-Allow-Origin':  allow,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type'
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Vary': 'Origin'
   };
+}
+
+exports.handler = async (event) => {
+  const corsHeaders = corsHeadersFor(event);
 
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers: corsHeaders, body: '' };
@@ -43,14 +57,39 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers: corsHeaders, body: 'Invalid JSON' };
   }
 
-  const { order, items } = payload;
-  if (!order || !order.order_number || !order.customer_email) {
-    return {
-      statusCode: 400,
-      headers: corsHeaders,
-      body: JSON.stringify({ error: 'Missing order or customer_email' })
-    };
+  // SECURITY: never trust the order/items the browser sends. Take only the
+  // order id and re-read the authoritative order + items from Supabase, so this
+  // endpoint can't be abused to send arbitrary "Deli Depot" emails to anyone.
+  const orderId = payload.orderId || payload.order?.id;
+  if (!orderId) {
+    return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Missing order id' }) };
   }
+
+  const supaUrl    = process.env.SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supaUrl || !serviceKey) {
+    console.error('[send-order-email] SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not configured');
+    return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: 'Email service not configured' }) };
+  }
+
+  const supabase = createClient(supaUrl, serviceKey, {
+    auth: { persistSession: false, autoRefreshToken: false }
+  });
+
+  const { data: order, error: orderErr } = await supabase
+    .from('orders')
+    .select('id, order_number, customer_name, customer_email, customer_phone, collection_slot, subtotal, total, notes')
+    .eq('id', orderId)
+    .single();
+  if (orderErr || !order || !order.customer_email) {
+    console.error('[send-order-email] order not found / no email', orderId, orderErr);
+    return { statusCode: 404, headers: corsHeaders, body: JSON.stringify({ error: 'Order not found' }) };
+  }
+
+  const { data: items } = await supabase
+    .from('order_items')
+    .select('meal_name, bundle_type, quantity, line_total')
+    .eq('order_id', orderId);
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -213,7 +252,7 @@ function buildHtml(order, items) {
                     <p style="margin:0;color:#c9a961;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;font-weight:600;">Total</p>
                     <p style="margin:6px 0 16px;color:#c9a961;font-size:22px;font-weight:600;">£${total}</p>
                     <p style="margin:0;color:#c9a961;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;font-weight:600;">Payment</p>
-                    <p style="margin:6px 0 0;color:#f5f1e8;font-size:14px;">On collection — cash or card.</p>
+                    <p style="margin:6px 0 0;color:#f5f1e8;font-size:14px;">Paid by card — nothing to pay on collection.</p>
                   </td>
                 </tr>
               </table>
@@ -282,7 +321,7 @@ function buildText(order, items) {
   lines.push('');
   lines.push(`Collection: ${collection}`);
   lines.push(`Total: £${total}`);
-  lines.push('Payment: On collection — cash or card.');
+  lines.push('Payment: Paid by card — nothing to pay on collection.');
   lines.push('');
   lines.push('Items:');
   items.forEach((it) => {
@@ -330,7 +369,7 @@ function buildDeliHtml(order, items) {
           <td style="padding:10px 0 0;text-align:right;"><strong>£${total}</strong></td></tr>
     </table>
     ${order.notes ? `<h3 style="margin:18px 0 6px;">Customer note</h3><p style="margin:0;">${escapeHtml(order.notes)}</p>` : ''}
-    <p style="margin:22px 0 0;color:#888;font-size:12px;">Payment due on collection. Manage this order in your admin dashboard.</p>
+    <p style="margin:22px 0 0;color:#888;font-size:12px;">Paid online by card. Manage this order in your admin dashboard.</p>
   </body></html>`;
 }
 
@@ -349,7 +388,7 @@ function buildDeliText(order, items) {
   });
   if (!items.length) lines.push('  (No items recorded)');
   lines.push('');
-  lines.push(`Total: £${parseFloat(order.total || 0).toFixed(2)} (due on collection)`);
+  lines.push(`Total: £${parseFloat(order.total || 0).toFixed(2)} (paid online by card)`);
   if (order.notes) { lines.push(''); lines.push(`Customer note: ${order.notes}`); }
   return lines.join('\n');
 }

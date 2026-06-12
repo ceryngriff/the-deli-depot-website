@@ -177,7 +177,7 @@ function rowHtml(o) {
       </td>
       <td>${items}</td>
       <td style="font-size: 0.85rem;">${escapeHtml(slot)}</td>
-      <td>£${parseFloat(o.total).toFixed(2)}</td>
+      <td>£${parseFloat(o.total || 0).toFixed(2)}</td>
       <td><span class="status-badge status-${escapeHtml(o.status)}">${escapeHtml(o.status)}</span></td>
       <td><span class="status-badge status-${o.payment_status === 'paid' ? 'ready' : 'pending'}">${escapeHtml(o.payment_status)}</span></td>
       <td class="admin-table__actions">
@@ -255,7 +255,7 @@ function renderDetail() {
         <h3>Collection</h3>
         <dl class="order-detail__grid">
           <div><dt>Slot</dt><dd>${escapeHtml(slot)}</dd></div>
-          <div><dt>Total</dt><dd>£${parseFloat(o.total).toFixed(2)}</dd></div>
+          <div><dt>Total</dt><dd>£${parseFloat(o.total || 0).toFixed(2)}</dd></div>
         </dl>
       </section>
 

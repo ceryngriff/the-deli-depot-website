@@ -109,7 +109,7 @@ function collectionCardHtml(o) {
         <span class="status-badge status-${escapeHtml(o.status)}">${escapeHtml(o.status)}</span>
       </div>
       <p class="collection-card__name"><strong>${escapeHtml(o.customer_name || 'Guest')}</strong></p>
-      <p class="collection-card__meta">${escapeHtml(o.order_number)} · ${totalItems} item${totalItems === 1 ? '' : 's'} · £${parseFloat(o.total).toFixed(2)}</p>
+      <p class="collection-card__meta">${escapeHtml(o.order_number)} · ${totalItems} item${totalItems === 1 ? '' : 's'} · £${parseFloat(o.total || 0).toFixed(2)}</p>
       <div class="collection-card__actions">
         ${canPrep ? `<button class="btn btn--sm" data-order-id="${escapeHtml(o.id)}" data-status-change="preparing">Mark Preparing</button>` : ''}
         ${canReady ? `<button class="btn btn--sm" data-order-id="${escapeHtml(o.id)}" data-status-change="ready">Mark Ready</button>` : ''}

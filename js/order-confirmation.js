@@ -45,7 +45,7 @@ function render({ order, items }) {
     .charAt(0).toUpperCase() + (order.status || 'pending').slice(1);
   document.getElementById('order-collection').textContent = formatDateTime(order.collection_slot);
   document.getElementById('order-customer').textContent = order.customer_name || '—';
-  document.getElementById('order-total').textContent = `£${parseFloat(order.total).toFixed(2)}`;
+  document.getElementById('order-total').textContent = `£${parseFloat(order.total || 0).toFixed(2)}`;
 
   // Payment status (capitalised) when the cached/DB order carries it.
   const paymentEl = document.getElementById('order-payment');

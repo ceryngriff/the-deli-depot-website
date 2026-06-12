@@ -264,7 +264,7 @@ async function renderDetail() {
           </label>
           <label class="admin-field">
             <span>Discount</span>
-            <input type="text" value="${s.discount_percent}%" disabled />
+            <input type="text" value="${s.discount_percent ?? 0}%" disabled />
           </label>
         </div>
         <div class="admin-form__row">
@@ -332,7 +332,7 @@ async function renderDetail() {
               <li>
                 <div class="order-line-items__head">
                   <strong>${escapeHtml(o.order_number)}</strong>
-                  <span>£${parseFloat(o.total).toFixed(2)}</span>
+                  <span>£${parseFloat(o.total || 0).toFixed(2)}</span>
                 </div>
                 <p class="order-line-items__sub">
                   ${escapeHtml(new Date(o.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }))}

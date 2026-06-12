@@ -57,17 +57,16 @@ exports.handler = async (event) => {
     switch (stripeEvent.type) {
       case 'payment_intent.succeeded': {
         const intent = stripeEvent.data.object;
-        await updateOrderPayment(intent.metadata?.order_id, {
-          payment_status: 'paid',
-          status:         'confirmed'
-        });
+        await confirmOrderPaid(intent.metadata?.order_id, intent);
         break;
       }
       case 'payment_intent.payment_failed': {
         const intent = stripeEvent.data.object;
-        await updateOrderPayment(intent.metadata?.order_id, {
-          payment_status: 'failed'
-        });
+        // payment_status only allows unpaid/paid/refunded, so we don't write a
+        // 'failed' value (that would violate the CHECK constraint and make
+        // Stripe retry forever). The order simply stays pending/unpaid; the
+        // customer can retry their card. Just record it in the logs.
+        console.warn(`[stripe-webhook] payment failed for order ${intent.metadata?.order_id || '?'}`);
         break;
       }
       default:
@@ -84,8 +83,10 @@ exports.handler = async (event) => {
   return { statusCode: 200, body: JSON.stringify({ received: true }) };
 };
 
-// Update the order row using the service-role key (bypasses RLS).
-async function updateOrderPayment(orderId, fields) {
+// Mark an order paid — but only after verifying the amount Stripe collected
+// matches the order's server-recorded total. This is the last line of defence
+// against a tampered/underpaid PaymentIntent confirming an order.
+async function confirmOrderPaid(orderId, intent) {
   if (!orderId) {
     console.warn('[stripe-webhook] event had no order_id in metadata — skipping');
     return;
@@ -101,11 +102,34 @@ async function updateOrderPayment(orderId, fields) {
     auth: { persistSession: false, autoRefreshToken: false }
   });
 
+  const { data: order, error: readErr } = await supabase
+    .from('orders')
+    .select('id, total, payment_status')
+    .eq('id', orderId)
+    .single();
+  if (readErr || !order) {
+    throw new Error(`order ${orderId} not found: ${readErr?.message || 'missing'}`);
+  }
+
+  // Already reconciled — acknowledge and stop (idempotent on Stripe retries).
+  if (order.payment_status === 'paid') {
+    console.log(`[stripe-webhook] order ${orderId} already paid — skipping`);
+    return;
+  }
+
+  const expected = Math.round(Number(order.total) * 100);
+  const received = Number(intent.amount_received ?? intent.amount ?? 0);
+  if (received < expected) {
+    // Underpayment — do NOT confirm. Leave the order pending for manual review.
+    console.error(`[stripe-webhook] amount mismatch for order ${orderId}: received ${received}p, expected ${expected}p — NOT confirming`);
+    return;
+  }
+
   const { error } = await supabase
     .from('orders')
-    .update(fields)
+    .update({ payment_status: 'paid', status: 'confirmed' })
     .eq('id', orderId);
 
   if (error) throw error;
-  console.log(`[stripe-webhook] order ${orderId} →`, fields);
+  console.log(`[stripe-webhook] order ${orderId} → paid/confirmed (${received}p)`);
 }

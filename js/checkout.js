@@ -389,6 +389,9 @@ async function createOrderAndShowPayment() {
 
   // Build the line items for the order.
   const itemRows = items.map((item) => ({
+    // slug is what the server prices against (place_order looks the
+    // authoritative price up from the meals table by slug + bundle_type).
+    slug:          item.slug || null,
     meal_id:       item.meal_id || null,
     meal_name:     item.name,
     bundle_type:   toBundleType(item.bundle),
@@ -440,6 +443,12 @@ async function createOrderAndShowPayment() {
       return;
     }
 
+    // place_order recomputes the price server-side and returns the
+    // authoritative total. Use THAT everywhere from here on — never the
+    // client-side basket estimate — so what we display and charge matches
+    // what the database recorded.
+    const serverTotal = Number(order.total ?? subtotal);
+
     // Cache the order details so the confirmation page can show them even for
     // guests (RLS won't let anon read their own orders back). Stays 'unpaid'
     // here — we re-stamp it 'paid' after the card is confirmed.
@@ -451,16 +460,18 @@ async function createOrderAndShowPayment() {
       customer_phone:  phone,
       status:          'pending',
       collection_slot: collectionDateTime.toISOString(),
-      subtotal:        subtotal,
-      total:           subtotal,
+      subtotal:        serverTotal,
+      total:           serverTotal,
       notes:           notes || null,
       payment_status:  'unpaid'
     };
-    createdOrder = { order, itemRows, cachedOrder, subtotal, fullName, email };
+    createdOrder = { order, itemRows, cachedOrder, subtotal: serverTotal, fullName, email };
   }
 
-  // 2. Create the Stripe PaymentIntent for this order's total.
-  const { order, cachedOrder } = createdOrder;
+  // 2. Create the Stripe PaymentIntent for this order's total. The amount is
+  // re-derived server-side from the order row inside the function; the value
+  // we send is only a display hint.
+  const { order, cachedOrder, subtotal: chargeTotal } = createdOrder;
   let clientSecret;
   try {
     const resp = await withTimeout(fetch('/.netlify/functions/create-payment-intent', {
@@ -469,7 +480,7 @@ async function createOrderAndShowPayment() {
       body: JSON.stringify({
         orderId:       order.id,
         orderNumber:   order.order_number,
-        amountPence:   Math.round(subtotal * 100),
+        amountPence:   Math.round(chargeTotal * 100), // display hint; server re-derives
         customerEmail: email,
         customerName:  fullName
       })
@@ -508,7 +519,7 @@ async function createOrderAndShowPayment() {
   // Hand off to the pay step — the next button press confirms the card.
   if (submitBtn) {
     submitBtn.disabled = false;
-    submitBtn.textContent = `Pay £${subtotal.toFixed(2)}`;
+    submitBtn.textContent = `Pay £${chargeTotal.toFixed(2)}`;
   }
 }
 
@@ -578,7 +589,9 @@ async function sendConfirmationEmail(order, items) {
   const resp = await fetch('/.netlify/functions/send-order-email', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ order, items })
+    // The function re-reads the authoritative order + items from Supabase by
+    // id; we only need to tell it which order.
+    body: JSON.stringify({ orderId: order.id })
   });
   // We don't care about the result — order is already created.
   // The Netlify Function logs failures on its side.

@@ -114,7 +114,7 @@
       "tagline": "Overnight oats, whey, banana, almond butter",
       "category": "breakfast",
       "description": "Creamy overnight oats blended with whey protein powder, topped with sliced banana, almond butter, granola crunch and a drizzle of honey. Grab-and-go breakfast fuel.",
-      "image": "assets/meals/banana-oats.jpg",
+      "image": "assets/meals/banana-oats.webp",
       "macros": { "kcal": 420, "protein": 32, "carbs": 52, "fat": 10 },
       "price_single": 4.50,
       "price_bundle_5": 20.00,

@@ -145,7 +145,7 @@ function orderCardHtml(order) {
       <dl class="order-card__meta">
         <div><dt>Collection</dt><dd>${escapeHtml(collection)}</dd></div>
         <div><dt>Items</dt><dd>${(order.order_items || []).length}</dd></div>
-        <div><dt>Total</dt><dd>£${parseFloat(order.total).toFixed(2)}</dd></div>
+        <div><dt>Total</dt><dd>£${parseFloat(order.total || 0).toFixed(2)}</dd></div>
         <div><dt>Payment</dt><dd>${escapeHtml(order.payment_status)}</dd></div>
       </dl>
       <details class="order-card__details">

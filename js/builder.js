@@ -145,46 +145,30 @@ const MealBuilder = (() => {
     const container = document.getElementById('step-1-options');
     if (!container) return;
 
-    container.innerHTML = INGREDIENTS.proteins.map(protein => `
-      <div class="builder-options">
+    // Render the protein options (and, under the selected one, the portion
+    // selector) INTO #step-1-options. Earlier this overwrote the parent
+    // .builder-step, which destroyed the step heading and #step-1-options
+    // itself — after which this function early-returned forever and the
+    // portion selector never appeared.
+    const selected = state.protein
+      ? INGREDIENTS.proteins.find(p => p.id === state.protein)
+      : null;
+
+    container.innerHTML = `
+      ${INGREDIENTS.proteins.map(protein => `
         <label class="builder-option ${state.protein === protein.id ? 'is-selected' : ''}">
           <input type="radio" name="protein" value="${protein.id}" ${state.protein === protein.id ? 'checked' : ''} />
           <span class="builder-option__name">${escapeHtml(protein.name)}</span>
-          <span class="builder-option__price">£${getProteinPrice(protein, 150).toFixed(2)}</span>
+          <span class="builder-option__price">From £${protein.basePrice.toFixed(2)}</span>
         </label>
-        ${state.protein === protein.id ? renderPortionSelector(protein) : ''}
-      </div>
-    `).join('');
-
-    // Re-wrap in proper grid
-    const optionsWrapper = container.parentElement;
-    optionsWrapper.innerHTML = `<div class="builder-options" style="grid-column: 1 / -1;">
-      ${INGREDIENTS.proteins.map(protein => `
-        <div>
-          <label class="builder-option ${state.protein === protein.id ? 'is-selected' : ''}">
-            <input type="radio" name="protein" value="${protein.id}" ${state.protein === protein.id ? 'checked' : ''} />
-            <span class="builder-option__name">${escapeHtml(protein.name)}</span>
-            <span class="builder-option__price">From £${protein.basePrice.toFixed(2)}</span>
-          </label>
-        </div>
       `).join('')}
-    </div>`;
+      ${selected ? renderPortionSelector(selected) : ''}
+    `;
 
-    if (state.protein) {
-      const proteinLabel = optionsWrapper.querySelector(`[value="${state.protein}"]`);
-      if (proteinLabel) {
-        proteinLabel.closest('.builder-option').insertAdjacentHTML('afterend', `
-          <div class="portion-selector" style="grid-column: 1 / -1; margin-top: 1rem;">
-            <span style="color: var(--cream-muted); font-size: 0.9rem;">Portion size:</span>
-            ${[150, 200, 250].map(size => `
-              <button type="button" class="portion-btn ${state.proteinPortion === size ? 'is-selected' : ''}" data-portion="${size}">
-                ${size}g
-              </button>
-            `).join('')}
-          </div>
-        `);
-      }
-    }
+    // Re-bind only the elements we just re-rendered. The old inputs are gone
+    // with the innerHTML swap, so their listeners are discarded — no stacking.
+    attachProteinListeners();
+    setupPortionListeners();
   }
 
   /**
@@ -314,16 +298,8 @@ const MealBuilder = (() => {
    * Setup event listeners
    */
   function setupEventListeners() {
-    // Protein selection
-    document.querySelectorAll('input[name="protein"]').forEach(input => {
-      input.addEventListener('change', (e) => {
-        state.protein = e.target.value;
-        renderStep1();
-        setupPortionListeners();
-        setupEventListeners();
-        updateSummary();
-      });
-    });
+    // Protein listeners are (re)bound by renderStep1 each time it re-renders.
+    attachProteinListeners();
 
     // Carb selection
     document.querySelectorAll('input[name="carb"]').forEach(input => {
@@ -392,6 +368,20 @@ const MealBuilder = (() => {
         }, 1500);
       });
     }
+  }
+
+  /**
+   * Bind change listeners to the protein radios. Called on init and again
+   * after every renderStep1() re-render (the radios are recreated each time).
+   */
+  function attachProteinListeners() {
+    document.querySelectorAll('input[name="protein"]').forEach(input => {
+      input.addEventListener('change', (e) => {
+        state.protein = e.target.value;
+        renderStep1();
+        updateSummary();
+      });
+    });
   }
 
   /**
