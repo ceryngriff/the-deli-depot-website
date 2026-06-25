@@ -25,9 +25,16 @@ function getRedirectTarget() {
   const params = new URLSearchParams(window.location.search);
   const raw = params.get('redirect');
   if (!raw) return defaultRedirectTarget();
-  // Block off-site redirects (open-redirect protection).
-  if (/^https?:/i.test(raw) || raw.startsWith('//')) return defaultRedirectTarget();
-  return raw;
+  // Open-redirect protection: resolve against our own origin and only accept
+  // it if it stays on this site. This blocks absolute URLs (https://evil.com),
+  // protocol-relative (//evil.com) and backslash tricks (/\evil.com).
+  try {
+    const u = new URL(raw, window.location.origin);
+    if (u.origin !== window.location.origin) return defaultRedirectTarget();
+    return u.pathname + u.search + u.hash;
+  } catch {
+    return defaultRedirectTarget();
+  }
 }
 
 function showMessage(text, type = 'info') {

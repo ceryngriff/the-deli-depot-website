@@ -14,6 +14,23 @@ database change you must apply (Claude can't reach the live DB).
 
 (The HSTS security header was added in `netlify.toml` and deploys automatically.)
 
+### After the next deploy — quick test of the new CSP
+A Content-Security-Policy header was added (locks down where scripts/data load
+from). It's been set carefully, but please click through once and check nothing
+broke:
+- [ ] **Checkout** — the card form appears and a test payment works (most important)
+- [ ] **Homepage** — the Google map shows; fonts look right
+- [ ] If anything looks off, open the browser console (F12) and send Claude any
+      red "Content-Security-Policy" messages — it's a one-line fix to allow-list.
+
+### Rate-limiting the serverless functions (low priority)
+Reviewed — the functions are already reasonably protected (each requires a valid
+unguessable order ID, payments use idempotency keys, the webhook is signature-
+verified, and CORS is locked to our domains). No urgent hole. If you want
+belt-and-braces against volume abuse / email-quota burn later:
+- [ ] Enable Netlify's platform **rate limiting** on the `/.netlify/functions/*`
+      paths (dashboard), or add a small per-order "email already sent" guard.
+
 ### Always-HTTPS
 - [ ] Netlify → Domain management → **HTTPS** → make sure **"Force HTTPS"** is ON
       (redirects any `http://` visit to `https://`). Usually on by default once

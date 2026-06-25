@@ -14,6 +14,13 @@
     Permissions-Policy = "camera=(), microphone=(), geolocation=(self)"
     # Force HTTPS for a year (Netlify serves the site over HTTPS).
     Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    # Content-Security-Policy: restrict where scripts/styles/data can load from.
+    # Allow-listed: Stripe (payments), Supabase (data/auth), Google Fonts,
+    # Google Maps (the contact map iframe), esm.sh (Supabase JS module).
+    # 'unsafe-inline' on script is required because the Supabase/Stripe config
+    # is injected inline at deploy time; connect-src still tightly limits where
+    # data can be sent, which is the main anti-exfiltration protection.
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://m.stripe.network https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://m.stripe.network https://esm.sh; frame-src https://js.stripe.com https://hooks.stripe.com https://www.google.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
 
 # No build step / no filename hashing, so JS + CSS must revalidate every load
 # (cheap 304s via ETag). Otherwise updated code never reaches browsers that
