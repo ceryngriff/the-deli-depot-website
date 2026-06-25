@@ -6,41 +6,45 @@
 const MealBuilder = (() => {
   'use strict';
 
-  // Ingredient macros and pricing
-  const INGREDIENTS = {
-    proteins: [
-      { id: 'chicken', name: 'Grilled Chicken Breast', basePrice: 5.50, portionPrice: 1.00, kcal: 165, protein: 31, carbs: 0, fat: 3.6 },
-      { id: 'beef', name: 'Lean Beef Mince', basePrice: 6.00, portionPrice: 1.00, kcal: 250, protein: 26, carbs: 0, fat: 15 },
-      { id: 'salmon', name: 'Salmon Fillet', basePrice: 7.00, portionPrice: 1.50, kcal: 280, protein: 25, carbs: 0, fat: 20 },
-      { id: 'turkey', name: 'Turkey Breast', basePrice: 5.50, portionPrice: 1.00, kcal: 165, protein: 29, carbs: 0, fat: 3.8 },
-      { id: 'tofu', name: 'Tofu', basePrice: 4.50, portionPrice: 0.75, kcal: 76, protein: 8, carbs: 1.9, fat: 4.8 },
-      { id: 'halloumi', name: 'Griddled Halloumi', basePrice: 5.50, portionPrice: 1.00, kcal: 330, protein: 26, carbs: 0.7, fat: 27 }
-    ],
-    carbs: [
-      { id: 'basmati', name: 'Basmati Rice', priceModifier: 0, kcal: 130, protein: 2.7, carbs: 28, fat: 0.3 },
-      { id: 'sweet-potato', name: 'Sweet Potato', priceModifier: 0, kcal: 86, protein: 1.6, carbs: 20, fat: 0.1 },
-      { id: 'pasta', name: 'Wholewheat Pasta', priceModifier: 0, kcal: 124, protein: 4.3, carbs: 25, fat: 0.5 },
-      { id: 'quinoa', name: 'Quinoa', priceModifier: 0.50, kcal: 120, protein: 4.4, carbs: 21, fat: 1.9 },
-      { id: 'leaves', name: 'Mixed Leaves', priceModifier: 0, kcal: 15, protein: 2.6, carbs: 2.9, fat: 0.3 },
-      { id: 'no-carb', name: 'No Carb', priceModifier: -0.50, kcal: 0, protein: 0, carbs: 0, fat: 0 }
-    ],
-    veg: [
-      { id: 'broccoli', name: 'Tenderstem Broccoli', kcal: 34, protein: 2.8, carbs: 7, fat: 0.4 },
-      { id: 'peppers', name: 'Roasted Peppers', kcal: 37, protein: 0.9, carbs: 9, fat: 0.3 },
-      { id: 'beans', name: 'Green Beans', kcal: 31, protein: 2.1, carbs: 7, fat: 0.2 },
-      { id: 'carrots', name: 'Roasted Carrots', kcal: 41, protein: 0.9, carbs: 10, fat: 0.2 },
-      { id: 'spinach', name: 'Wilted Spinach', kcal: 23, protein: 2.9, carbs: 3.6, fat: 0.4 },
-      { id: 'courgette', name: 'Courgette Ribbons', kcal: 17, protein: 1.2, carbs: 3.2, fat: 0.4 }
-    ],
-    sauces: [
-      { id: 'piri', name: 'Piri Piri', kcal: 20, protein: 0, carbs: 2, fat: 1.5 },
-      { id: 'tikka', name: 'Tikka', kcal: 18, protein: 0.5, carbs: 1, fat: 1 },
-      { id: 'bbq', name: 'BBQ', kcal: 22, protein: 0, carbs: 5, fat: 0.3 },
-      { id: 'sweet-chilli', name: 'Sweet Chilli', kcal: 25, protein: 0, carbs: 6, fat: 0.2 },
-      { id: 'garlic-herb', name: 'Garlic Herb', kcal: 30, protein: 0.3, carbs: 1, fat: 3 },
-      { id: 'lemon-pepper', name: 'Lemon Pepper', kcal: 15, protein: 0, carbs: 0.5, fat: 1.5 }
-    ]
+  // Ingredient macros, pricing, allergens & kitchen portions now live in the
+  // shared single-source file js/builder-data.js (window.BUILDER_INGREDIENTS),
+  // so the customer builder and the admin order view never drift apart.
+  // (Fallback to an empty shape if that script failed to load.)
+  const INGREDIENTS = window.BUILDER_INGREDIENTS || { proteins: [], carbs: [], veg: [], sauces: [] };
+
+  // Allergen display labels (mirrors the keys in js/allergens.js).
+  const ALLERGEN_LABELS = {
+    dairy: 'Dairy / Milk', gluten: 'Gluten', eggs: 'Eggs', fish: 'Fish',
+    crustaceans: 'Crustaceans', molluscs: 'Molluscs', nuts: 'Tree nuts',
+    peanuts: 'Peanuts', sesame: 'Sesame', soy: 'Soy', celery: 'Celery',
+    mustard: 'Mustard', sulphites: 'Sulphites', lupin: 'Lupin'
   };
+
+  // Every allergen key. Until ingredients are delivered and allergen-checked,
+  // custom meals declare "may contain" ALL of these (shared-kitchen / not-yet-
+  // verified caution). Tighten this once stock is purged and triple-checked.
+  const ALL_ALLERGEN_KEYS = Object.keys(ALLERGEN_LABELS);
+
+  // Small "Keto" badge shown on keto-friendly options
+  function ketoBadge(item) {
+    return item.keto ? '<span class="builder-option__keto">Keto</span>' : '';
+  }
+
+  /**
+   * Collect the de-duplicated allergen keys across everything currently
+   * selected (protein + carb + veg + sauce).
+   */
+  function collectAllergens() {
+    const set = new Set();
+    const add = (item) => { (item?.allergens || []).forEach(a => set.add(a)); };
+
+    if (state.protein) add(INGREDIENTS.proteins.find(p => p.id === state.protein));
+    if (state.carb)    add(INGREDIENTS.carbs.find(c => c.id === state.carb));
+    state.veg.forEach(id => add(INGREDIENTS.veg.find(v => v.id === id)));
+    if (state.sauce)   add(INGREDIENTS.sauces.find(s => s.id === state.sauce));
+
+    return Array.from(set);
+  }
 
   const state = {
     protein: null,
@@ -139,6 +143,23 @@ const MealBuilder = (() => {
   }
 
   /**
+   * Human-readable list of what's still needed before the meal can be
+   * added to the basket. Drives the hint under the Add button so customers
+   * are never stuck wondering why it's greyed out.
+   */
+  function missingSteps() {
+    const missing = [];
+    if (!state.protein) missing.push('a protein');
+    if (!state.carb) missing.push('a carb base');
+    if (state.veg.length < 2) {
+      const left = 2 - state.veg.length;
+      missing.push(`${left} more vegetable${left === 1 ? '' : 's'}`);
+    }
+    if (!state.sauce) missing.push('a sauce');
+    return missing;
+  }
+
+  /**
    * Render protein step
    */
   function renderStep1() {
@@ -160,6 +181,7 @@ const MealBuilder = (() => {
           <input type="radio" name="protein" value="${protein.id}" ${state.protein === protein.id ? 'checked' : ''} />
           <span class="builder-option__name">${escapeHtml(protein.name)}</span>
           <span class="builder-option__price">From £${protein.basePrice.toFixed(2)}</span>
+          ${ketoBadge(protein)}
         </label>
       `).join('')}
       ${selected ? renderPortionSelector(selected) : ''}
@@ -200,6 +222,7 @@ const MealBuilder = (() => {
           <input type="radio" name="carb" value="${carb.id}" ${state.carb === carb.id ? 'checked' : ''} />
           <span class="builder-option__name">${escapeHtml(carb.name)}</span>
           ${carb.priceModifier !== 0 ? `<span class="builder-option__price">${carb.priceModifier > 0 ? '+' : ''}£${Math.abs(carb.priceModifier).toFixed(2)}</span>` : ''}
+          ${ketoBadge(carb)}
         </label>
       `).join('')}
     </div>`;
@@ -219,6 +242,7 @@ const MealBuilder = (() => {
           <input type="checkbox" name="veg" value="${veg.id}" ${state.veg.includes(veg.id) ? 'checked' : ''} />
           <span class="builder-option__name">${escapeHtml(veg.name)}</span>
           <span class="builder-option__info">(Pick 2)</span>
+          ${ketoBadge(veg)}
         </label>
       `).join('')}
     </div>`;
@@ -238,6 +262,7 @@ const MealBuilder = (() => {
           <input type="radio" name="sauce" value="${sauce.id}" ${state.sauce === sauce.id ? 'checked' : ''} />
           <span class="builder-option__name">${escapeHtml(sauce.name)}</span>
           <span class="builder-option__info">Included</span>
+          ${ketoBadge(sauce)}
         </label>
       `).join('')}
     </div>`;
@@ -271,6 +296,14 @@ const MealBuilder = (() => {
         html += `<p class="builder-summary__item">+ <strong>${s.name}</strong> sauce</p>`;
       }
 
+      if (html) {
+        const allergens = collectAllergens();
+        if (allergens.length) {
+          html += `<p class="builder-summary__allergens"><strong>⚠️ Contains:</strong> ${allergens.map(a => ALLERGEN_LABELS[a] || a).join(', ')}</p>`;
+        }
+        html += `<p class="builder-summary__allergens-note"><strong>May contain any of the 14 major allergens.</strong> Our ingredients are not yet allergen-verified and all meals are made in a shared kitchen. If you have an allergy, please ask before ordering.</p>`;
+      }
+
       summaryItems.innerHTML = html || '<p style="color: var(--muted);">Select items to build your meal...</p>';
     }
 
@@ -287,10 +320,28 @@ const MealBuilder = (() => {
     const priceEl = document.querySelector('.builder-summary__price-value');
     if (priceEl) priceEl.textContent = `£${price.toFixed(2)}`;
 
-    // Update button
+    // Update button + "what's still needed" hint
     const addBtn = document.querySelector('.builder-summary__add-btn');
     if (addBtn) {
-      addBtn.disabled = !isComplete();
+      const done = isComplete();
+      addBtn.disabled = !done;
+      addBtn.textContent = done ? `Add to Basket · £${price.toFixed(2)}` : 'Add to Basket';
+
+      // Hint element lives right after the button (created once).
+      let hint = document.querySelector('.builder-summary__needed');
+      if (!hint) {
+        hint = document.createElement('p');
+        hint.className = 'builder-summary__needed';
+        addBtn.insertAdjacentElement('afterend', hint);
+      }
+      const missing = missingSteps();
+      if (done) {
+        hint.textContent = '';
+        hint.hidden = true;
+      } else {
+        hint.textContent = `Still to choose: ${missing.join(', ')}`;
+        hint.hidden = false;
+      }
     }
   }
 
@@ -350,6 +401,11 @@ const MealBuilder = (() => {
           bundle: 'custom',
           quantity: 1,
           macros: macros,
+          // Allergens carried on the item so the basket can warn even though
+          // a custom meal has no Supabase meal_id to look up. "May contain"
+          // blankets all 14 until ingredients are delivered and verified.
+          allergens_contains: collectAllergens(),
+          allergens_may_contain: ALL_ALLERGEN_KEYS,
           custom: {
             protein: state.protein,
             proteinPortion: state.proteinPortion,

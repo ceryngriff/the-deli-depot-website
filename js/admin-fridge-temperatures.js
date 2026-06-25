@@ -14,6 +14,7 @@
 import './admin-shared.js';   // guard + sidebar
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
+import { loadDraft, makeDraftSaver } from './admin-check-draft.js';
 
 // ---------- STATE ----------
 
@@ -41,8 +42,37 @@ const els = {
   clearBtn:  document.getElementById('ft-clear'),
   exportBtn: document.getElementById('ft-export'),
 
-  table:     document.getElementById('ft-table')
+  table:     document.getElementById('ft-table'),
+  status:    document.querySelector('[data-draft-status]')
 };
+
+// ---------- DRAFT (save as you go) ----------
+
+const saveDraft = makeDraftSaver('fridge_reading', els.status);
+
+function snapshot() {
+  return {
+    unit:  els.unit.value,
+    type:  els.type.value,
+    temp:  els.temp.value,
+    when:  els.readingAt.value,
+    staff: els.staff.value,
+    notes: els.notes.value
+  };
+}
+
+function restore(d) {
+  if (!d) return;
+  if (d.unit != null)  els.unit.value = d.unit;
+  if (d.type)          els.type.value = d.type;
+  if (d.temp != null)  els.temp.value = d.temp;
+  if (d.when)          els.readingAt.value = d.when;
+  if (d.staff != null) els.staff.value = d.staff;
+  if (d.notes != null) els.notes.value = d.notes;
+}
+
+els.form?.addEventListener('input',  () => saveDraft(snapshot()));
+els.form?.addEventListener('change', () => saveDraft(snapshot()));
 
 // ---------- WARNING LOGIC ----------
 
@@ -202,6 +232,8 @@ async function submitReading(e) {
     toast('Reading saved.', 'success');
   }
 
+  saveDraft.flushClear();   // saved — discard the in-progress draft
+
   // Keep unit / type / staff for repeated logging; reset the rest to "now".
   els.temp.value = '';
   els.notes.value = '';
@@ -294,4 +326,13 @@ els.exportBtn?.addEventListener('click', exportCsv);
 // ---------- INIT ----------
 
 els.readingAt.value = toLocalInput(new Date());
+
+// Restore an unfinished reading if one was left part-typed.
+const ftDraft = loadDraft('fridge_reading');
+if (ftDraft) {
+  restore(ftDraft);
+  if (!ftDraft.when) els.readingAt.value = toLocalInput(new Date());
+  saveDraft.setStatus('Unfinished reading restored', 'saved');
+}
+
 loadLogs();

@@ -403,7 +403,9 @@ async function createOrderAndShowPayment() {
       proteinPortion: item.custom.proteinPortion,
       carb:           item.custom.carb,
       veg:            item.custom.veg,
-      sauce:          item.custom.sauce
+      sauce:          item.custom.sauce,
+      allergens:           item.allergens_contains || [],
+      allergens_may_contain: item.allergens_may_contain || []
     } : null,
     macros: item.macros || null
   }));

@@ -12,6 +12,7 @@
 import './admin-shared.js';   // guard + sidebar
 import { supabase } from './supabase.js';
 import { toast } from './toast.js';
+import { loadDraft, makeDraftSaver } from './admin-check-draft.js';
 
 // ---------- CONFIG ----------
 
@@ -135,6 +136,71 @@ document.querySelectorAll('[data-add-temp]').forEach((btn) => {
   btn.addEventListener('click', () => addTempRow(btn.dataset.addTemp));
 });
 
+// ---------- DRAFTS (save as you go) ----------
+
+const savers = { opening: null, closing: null };
+
+function snapshot(type) {
+  const form = document.getElementById(`${type}-form`);
+  const checklist = {};
+  form.querySelectorAll('.check-item').forEach((item) => {
+    const picked = item.querySelector('input:checked');
+    checklist[item.dataset.key] = picked ? picked.value : 'yes';
+  });
+  const temps = [];
+  form.querySelectorAll('.temp-row').forEach((row) => {
+    temps.push({
+      unit: row.querySelector('.temp-row__unit').value,
+      type: row.querySelector('.temp-row__type').value,
+      temp: row.querySelector('.temp-row__temp').value
+    });
+  });
+  return {
+    when:  document.getElementById(`${type}-when`).value,
+    staff: document.getElementById(`${type}-staff`).value,
+    notes: document.getElementById(`${type}-notes`).value,
+    checklist,
+    temps
+  };
+}
+
+function restore(type, d) {
+  if (!d) return;
+  const form = document.getElementById(`${type}-form`);
+  if (d.when)  document.getElementById(`${type}-when`).value = d.when;
+  if (d.staff != null) document.getElementById(`${type}-staff`).value = d.staff;
+  if (d.notes != null) document.getElementById(`${type}-notes`).value = d.notes;
+  if (d.checklist) {
+    Object.entries(d.checklist).forEach(([key, val]) => {
+      const radio = form.querySelector(`input[name="${type === 'opening' ? 'op' : 'cl'}-${key}"][value="${val}"]`);
+      if (radio) radio.checked = true;
+    });
+  }
+  if (Array.isArray(d.temps) && d.temps.length) {
+    const container = document.getElementById(`${type}-temps`);
+    container.innerHTML = '';
+    d.temps.forEach((t) => {
+      addTempRow(type);
+      const row = container.lastElementChild;
+      row.querySelector('.temp-row__unit').value = t.unit || '';
+      row.querySelector('.temp-row__type').value = t.type || 'fridge';
+      const tempInput = row.querySelector('.temp-row__temp');
+      tempInput.value = t.temp || '';
+      tempInput.dispatchEvent(new Event('input'));   // re-apply out-of-range flag
+    });
+    if (container.children.length === 0) addTempRow(type);
+  }
+}
+
+function setupDraft(type) {
+  const statusEl = document.querySelector(`[data-draft-status="${type}"]`);
+  const saver = makeDraftSaver(`${type}_check`, statusEl);
+  savers[type] = saver;
+  const form = document.getElementById(`${type}-form`);
+  form.addEventListener('input',  () => saver(snapshot(type)));
+  form.addEventListener('change', () => saver(snapshot(type)));
+}
+
 // ---------- SUBMIT ----------
 
 async function submitCheck(type, e) {
@@ -200,7 +266,7 @@ async function submitCheck(type, e) {
   if (error || !parent) {
     console.error('[oc-checks] insert parent', error);
     saveBtn.disabled = false;
-    saveBtn.textContent = `Submit ${cfg.title} Check`;
+    saveBtn.textContent = `Complete ${cfg.title} Check`;
     toast('Could not save the check. Please try again.', 'error');
     return;
   }
@@ -216,7 +282,7 @@ async function submitCheck(type, e) {
   }
 
   saveBtn.disabled = false;
-  saveBtn.textContent = `Submit ${cfg.title} Check`;
+  saveBtn.textContent = `Complete ${cfg.title} Check`;
 
   const flagged = cfg.items.filter(([key]) => checklist[key] === false).length;
   const tempsWarn = temps.filter((t) => isOutOfRange(t.unit_type, t.temperature_c)).length;
@@ -226,6 +292,7 @@ async function submitCheck(type, e) {
     toast(`${cfg.title} check saved.`, 'success');
   }
 
+  savers[type]?.flushClear();   // filed successfully — discard the draft
   resetForm(type);
   loadHistory(type);
 }
@@ -450,5 +517,14 @@ document.querySelectorAll('[data-export]').forEach((btn) => {
 ['opening', 'closing'].forEach((type) => {
   document.getElementById(`${type}-when`).value = toLocalInput(new Date());
   resetTempRows(type);
+  setupDraft(type);
+
+  // Restore an unfinished check if one was left part-done.
+  const draft = loadDraft(`${type}_check`);
+  if (draft) {
+    restore(type, draft);
+    savers[type].setStatus('Unfinished check restored', 'saved');
+  }
+
   loadHistory(type);
 });

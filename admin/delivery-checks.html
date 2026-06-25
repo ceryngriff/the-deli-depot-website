@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delivery Checks | Admin | The Deli Depot</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/account.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+
+  <script src="../js/env.js"></script>
+</head>
+<body class="admin">
+
+  <div class="admin-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar" aria-label="Admin navigation">
+      <a href="/admin/index.html" class="admin-sidebar__brand">
+        <span class="brand brand--small">
+          <span class="brand__deli">DELI</span>
+          <span class="brand__depot">Depot</span>
+        </span>
+        <span class="admin-sidebar__label">Admin</span>
+      </a>
+      <nav class="admin-nav" aria-label="Sections">
+        <a href="/admin/index.html">Dashboard</a>
+        <a href="/admin/menu.html">Menu</a>
+        <a href="/admin/orders.html">
+          Orders <span class="admin-nav__badge" data-pending-count hidden>0</span>
+        </a>
+        <a href="/admin/subscriptions.html">Subscriptions</a>
+        <a href="/admin/production.html">Production</a>
+        <a href="/admin/reports.html">Reports</a>
+        <a href="/admin/fridge-temperatures.html">Fridge Temps</a>
+        <a href="/admin/opening-closing-checks.html">Opening &amp; Closing Checks</a>
+        <a href="/admin/delivery-checks.html" class="is-active">Delivery Checks</a>
+      </nav>
+      <div class="admin-sidebar__bottom">
+        <nav class="admin-nav" aria-label="Account">
+          <a href="/index.html">Back to Site</a>
+          <a href="#" data-sign-out>Sign Out</a>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="admin-main">
+
+      <header class="admin-topbar">
+        <button class="admin-topbar__toggle" data-sidebar-toggle aria-label="Open menu">☰</button>
+        <h1 class="admin-topbar__title">Delivery Checks</h1>
+        <span class="admin-topbar__greeting">Hi, <span data-admin-greeting>Admin</span></span>
+      </header>
+
+      <main class="admin-content">
+
+        <section class="report-section">
+          <h2>New Delivery Check</h2>
+          <form class="admin-form" id="delivery-form">
+            <div class="admin-form__row">
+              <label class="admin-field">
+                <span>Date &amp; Time</span>
+                <input type="datetime-local" id="delivery-when" required />
+              </label>
+              <label class="admin-field">
+                <span>Staff (name / initials)</span>
+                <input type="text" id="delivery-staff" placeholder="e.g. CG" autocomplete="off" required />
+              </label>
+            </div>
+
+            <div class="admin-form__row">
+              <label class="admin-field">
+                <span>Supplier</span>
+                <input type="text" id="delivery-supplier" list="delivery-supplier-presets" placeholder="e.g. Booker" autocomplete="off" required />
+                <datalist id="delivery-supplier-presets">
+                  <option value="Booker"></option>
+                  <option value="Bidfood"></option>
+                  <option value="Brakes"></option>
+                  <option value="Nisbets"></option>
+                  <option value="Local butcher"></option>
+                  <option value="Local greengrocer"></option>
+                </datalist>
+              </label>
+              <label class="admin-field">
+                <span>Items received</span>
+                <input type="text" id="delivery-items" placeholder="e.g. chicken, salmon, dairy" autocomplete="off" />
+              </label>
+            </div>
+
+            <div class="check-list">
+              <div class="check-item" data-key="packaging_ok">
+                <span class="check-item__label">Packaging intact and undamaged</span>
+                <div class="check-toggle">
+                  <label class="check-toggle__opt"><input type="radio" name="dl-packaging_ok" value="yes" checked /><span>Yes</span></label>
+                  <label class="check-toggle__opt"><input type="radio" name="dl-packaging_ok" value="no" /><span>No</span></label>
+                </div>
+              </div>
+              <div class="check-item" data-key="dates_ok">
+                <span class="check-item__label">All items in date (use-by / best-before OK)</span>
+                <div class="check-toggle">
+                  <label class="check-toggle__opt"><input type="radio" name="dl-dates_ok" value="yes" checked /><span>Yes</span></label>
+                  <label class="check-toggle__opt"><input type="radio" name="dl-dates_ok" value="no" /><span>No</span></label>
+                </div>
+              </div>
+              <div class="check-item" data-key="labels_ok">
+                <span class="check-item__label">Allergen / ingredient labelling correct</span>
+                <div class="check-toggle">
+                  <label class="check-toggle__opt"><input type="radio" name="dl-labels_ok" value="yes" checked /><span>Yes</span></label>
+                  <label class="check-toggle__opt"><input type="radio" name="dl-labels_ok" value="no" /><span>No</span></label>
+                </div>
+              </div>
+              <div class="check-item" data-key="no_damage">
+                <span class="check-item__label">No contamination or signs of pest damage</span>
+                <div class="check-toggle">
+                  <label class="check-toggle__opt"><input type="radio" name="dl-no_damage" value="yes" checked /><span>Yes</span></label>
+                  <label class="check-toggle__opt"><input type="radio" name="dl-no_damage" value="no" /><span>No</span></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="admin-form__row">
+              <label class="admin-field">
+                <span>Chilled probe temp (°C)</span>
+                <input type="number" id="delivery-chilled" step="0.1" placeholder="e.g. 4.0" />
+                <span class="admin-field__hint">Accept chilled at 8°C or below</span>
+              </label>
+              <label class="admin-field">
+                <span>Frozen probe temp (°C)</span>
+                <input type="number" id="delivery-frozen" step="0.1" placeholder="e.g. -18.0" />
+                <span class="admin-field__hint">Frozen should be solid (≈ -18°C)</span>
+              </label>
+            </div>
+
+            <div class="admin-form__row">
+              <label class="admin-field">
+                <span>Outcome</span>
+                <select id="delivery-outcome">
+                  <option value="accepted">Accepted</option>
+                  <option value="accepted_with_note">Accepted with note</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </label>
+              <label class="admin-field">
+                <span>Notes / Issues (optional)</span>
+                <input type="text" id="delivery-notes" placeholder="Anything to flag…" autocomplete="off" />
+              </label>
+            </div>
+
+            <div class="ft-form__actions">
+              <button type="submit" class="btn" id="delivery-save-btn">Complete Delivery Check</button>
+              <span class="draft-status" data-draft-status></span>
+            </div>
+          </form>
+        </section>
+
+        <section class="report-section">
+          <div class="oc-history-head">
+            <h2>Delivery Check History</h2>
+            <button class="btn btn--outline" id="delivery-export">Export CSV</button>
+          </div>
+          <div id="delivery-history">
+            <p class="admin-table__empty">Loading…</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="../js/admin-delivery-checks.js"></script>
+</body>
+</html>

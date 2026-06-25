@@ -798,6 +798,14 @@ body.admin-login { background: var(--bg-deeper); }
   color: var(--cream-muted);
   margin: 0.2rem 0 0;
 }
+.order-line-items__build .order-build-line {
+  display: block;
+  line-height: 1.5;
+}
+.order-line-items__build .order-build-line strong {
+  color: var(--gold);
+  font-weight: 600;
+}
 
 .order-detail__actions {
   display: flex;
@@ -925,6 +933,17 @@ body.admin-login { background: var(--bg-deeper); }
   gap: 1rem;
   flex-wrap: wrap;
 }
+
+/* "Saves as you go" draft indicator next to the Complete button */
+.draft-status {
+  font-size: 0.8rem;
+  color: var(--cream-muted, var(--muted));
+  transition: opacity 0.2s ease;
+}
+.draft-status[data-state="saving"] { color: var(--cream-muted, var(--muted)); }
+.draft-status[data-state="saved"]  { color: #6fcf97; }
+.draft-status[data-state="saved"]::before { content: "✓ "; }
+.draft-status[data-state="error"]  { color: #f4b3a8; }
 
 /* Temperature reading badge in the log table */
 .temp-badge {

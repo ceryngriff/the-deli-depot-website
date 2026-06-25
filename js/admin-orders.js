@@ -332,15 +332,36 @@ function itemHtml(it) {
     ? `${it.macros.kcal || 0} kcal · ${it.macros.protein || 0}g protein · ${it.macros.carbs || 0}g carbs · ${it.macros.fat || 0}g fat`
     : '';
 
-  let buildLine = '';
+  // Build Your Own breakdown WITH kitchen portions, so staff know exactly
+  // what to plate. Names + amounts come from the shared js/builder-data.js.
+  let buildHtml = '';
   if (it.build_details) {
     const bd = it.build_details;
-    const bits = [];
-    if (bd.protein)     bits.push(`${bd.protein}${bd.proteinPortion ? ` ${bd.proteinPortion}g` : ''}`);
-    if (bd.carb)        bits.push(bd.carb);
-    if (bd.veg?.length) bits.push(bd.veg.join(' + '));
-    if (bd.sauce)       bits.push(`${bd.sauce} sauce`);
-    buildLine = bits.join(' · ');
+    const look = (id) => (window.findBuilderItem ? window.findBuilderItem(id) : null);
+    const nameOf = (id) => { const x = look(id); return x ? x.name : id; };
+    const amtOf  = (id) => { const x = look(id); return x && x.amount ? x.amount : ''; };
+    const lines = [];
+
+    if (bd.protein) {
+      const amt = bd.proteinPortion ? `${bd.proteinPortion}g` : '';
+      lines.push(`<strong>Protein:</strong> ${escapeHtml(nameOf(bd.protein))}${amt ? ` — ${escapeHtml(amt)}` : ''}`);
+    }
+    if (bd.carb) {
+      const a = amtOf(bd.carb);
+      lines.push(`<strong>Carb:</strong> ${escapeHtml(nameOf(bd.carb))}${a ? ` — ${escapeHtml(a)}` : ''}`);
+    }
+    if (bd.veg?.length) {
+      const vegStr = bd.veg.map((id) => {
+        const a = amtOf(id);
+        return `${escapeHtml(nameOf(id))}${a ? ` (${escapeHtml(a)})` : ''}`;
+      }).join(', ');
+      lines.push(`<strong>Veg:</strong> ${vegStr}`);
+    }
+    if (bd.sauce) {
+      const a = amtOf(bd.sauce);
+      lines.push(`<strong>Sauce:</strong> ${escapeHtml(nameOf(bd.sauce))}${a ? ` — ${escapeHtml(a)}` : ''}`);
+    }
+    buildHtml = lines.map((l) => `<span class="order-build-line">${l}</span>`).join('');
   }
 
   return `
@@ -350,7 +371,7 @@ function itemHtml(it) {
         <span>£${parseFloat(it.line_total).toFixed(2)}</span>
       </div>
       <p class="order-line-items__sub">${escapeHtml(bundle)} · ×${it.quantity} @ £${parseFloat(it.unit_price).toFixed(2)}</p>
-      ${buildLine ? `<p class="order-line-items__build">${escapeHtml(buildLine)}</p>` : ''}
+      ${buildHtml ? `<div class="order-line-items__build">${buildHtml}</div>` : ''}
       ${macros ? `<p class="order-line-items__sub" style="margin-top:0.2rem;">${escapeHtml(macros)}</p>` : ''}
     </li>
   `;

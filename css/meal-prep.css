@@ -893,6 +893,53 @@
   margin: 0;
 }
 
+.builder-option__keto {
+  align-self: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6fcf97;
+  background: rgba(111, 207, 151, 0.14);
+  border: 1px solid rgba(111, 207, 151, 0.35);
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  margin: 0;
+}
+
+.builder-summary__allergens {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin: 0.75rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+  color: #f4b3a8;
+}
+
+.builder-summary__allergens strong {
+  color: #f4b3a8;
+}
+
+.builder-summary__allergens--none {
+  color: var(--muted);
+}
+
+.builder-summary__allergens-note {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0.35rem 0 0;
+  line-height: 1.4;
+}
+
+/* "Still to choose: …" hint under the Add to Basket button */
+.builder-summary__needed {
+  font-size: 0.8rem;
+  color: var(--gold);
+  text-align: center;
+  margin: 0.6rem 0 0;
+  line-height: 1.4;
+}
+
 .builder-summary {
   position: sticky;
   top: 100px;

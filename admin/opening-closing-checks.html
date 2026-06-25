@@ -41,6 +41,7 @@
         <a href="/admin/reports.html">Reports</a>
         <a href="/admin/fridge-temperatures.html">Fridge Temps</a>
         <a href="/admin/opening-closing-checks.html" class="is-active">Opening &amp; Closing Checks</a>
+        <a href="/admin/delivery-checks.html">Delivery Checks</a>
       </nav>
       <div class="admin-sidebar__bottom">
         <nav class="admin-nav" aria-label="Account">
@@ -127,7 +128,8 @@
               </label>
 
               <div class="ft-form__actions">
-                <button type="submit" class="btn" id="opening-save-btn">Submit Opening Check</button>
+                <button type="submit" class="btn" id="opening-save-btn">Complete Opening Check</button>
+                <span class="draft-status" data-draft-status="opening"></span>
               </div>
             </form>
           </section>
@@ -211,7 +213,8 @@
               </label>
 
               <div class="ft-form__actions">
-                <button type="submit" class="btn" id="closing-save-btn">Submit Closing Check</button>
+                <button type="submit" class="btn" id="closing-save-btn">Complete Closing Check</button>
+                <span class="draft-status" data-draft-status="closing"></span>
               </div>
             </form>
           </section>

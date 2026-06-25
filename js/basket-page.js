@@ -174,18 +174,33 @@ async function renderAllergenWarning() {
 
   const items = basket.getBasket();
   const mealIds = Array.from(new Set(items.map((i) => i.meal_id).filter(Boolean)));
-  if (mealIds.length === 0) return;
 
-  // Fetch allergens for each unique meal in the basket
-  const { data: meals } = await supabase
-    .from('meals')
-    .select('id, name, allergens_contains, allergens_may_contain')
-    .in('id', mealIds);
-  if (!meals) return;
+  // Build Your Own / custom meals have no Supabase meal_id, so they're not in
+  // the `meals` table. They carry their own allergens_contains (set by the
+  // builder) — check those locally so custom meals warn too.
+  const customMeals = items
+    .filter((i) => !i.meal_id && (i.allergens_contains?.length || i.allergens_may_contain?.length))
+    .map((i) => ({
+      name: i.name || 'Build Your Own',
+      allergens_contains: i.allergens_contains || [],
+      allergens_may_contain: i.allergens_may_contain || []
+    }));
+
+  let meals = [];
+  if (mealIds.length) {
+    const { data } = await supabase
+      .from('meals')
+      .select('id, name, allergens_contains, allergens_may_contain')
+      .in('id', mealIds);
+    meals = data || [];
+  }
+
+  const allMeals = meals.concat(customMeals);
+  if (allMeals.length === 0) return;
 
   const offenders = [];
   const cautions = [];
-  meals.forEach((m) => {
+  allMeals.forEach((m) => {
     const r = checkMeal(m, customerAllergens);
     if (r.contains.length) {
       offenders.push({ name: m.name, allergens: r.contains });
