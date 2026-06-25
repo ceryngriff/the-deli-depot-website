@@ -14,6 +14,11 @@ database change you must apply (Claude can't reach the live DB).
 
 (The HSTS security header was added in `netlify.toml` and deploys automatically.)
 
+### Always-HTTPS
+- [ ] Netlify → Domain management → **HTTPS** → make sure **"Force HTTPS"** is ON
+      (redirects any `http://` visit to `https://`). Usually on by default once
+      the SSL certificate is issued — just confirm it's enabled.
+
 ---
 
 ## 💳 Stripe payments — take real money
