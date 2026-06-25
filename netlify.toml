@@ -12,6 +12,8 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=(self)"
+    # Force HTTPS for a year (Netlify serves the site over HTTPS).
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
 
 # No build step / no filename hashing, so JS + CSS must revalidate every load
 # (cheap 304s via ETag). Otherwise updated code never reaches browsers that
