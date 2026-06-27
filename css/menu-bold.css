@@ -1,0 +1,208 @@
+/* =========================================================
+   MENU PAGE — "FEED THE GRIND" BOLD TREATMENT
+   Athletic, high-energy pass over the weekly menu page.
+   Everything is scoped under .page-menu so the rest of the
+   site keeps the existing dark + gold house style.
+   Display face: Anton, used only for the big moments
+   (hero headline, macro numbers, prices).
+   ========================================================= */
+
+/* ---------- HERO ---------- */
+.page-menu .meal-hero {
+  padding-top: clamp(7rem, 12vw, 10rem);
+  overflow: hidden;
+}
+
+/* Eyebrow: tracked uppercase tag flanked by gold rules */
+.page-menu .meal-hero__accent {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: clamp(0.7rem, 1.6vw, 0.85rem);
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  color: var(--gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0;
+}
+.page-menu .meal-hero__accent::before,
+.page-menu .meal-hero__accent::after {
+  content: '';
+  width: clamp(1.4rem, 5vw, 3rem);
+  height: 2px;
+}
+.page-menu .meal-hero__accent::before {
+  background: linear-gradient(90deg, transparent, var(--gold));
+}
+.page-menu .meal-hero__accent::after {
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+
+/* Poster headline */
+.page-menu .meal-hero__title {
+  font-family: 'Anton', var(--sans);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(2.8rem, 9vw, 6.5rem);
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+  color: var(--cream);
+  margin: 1.1rem 0 0.9rem;
+  text-wrap: balance;
+}
+.page-menu .meal-hero__title .hl { color: var(--gold); }
+
+/* Slogan: bold kicker with a gold underline that sweeps in */
+.page-menu .meal-hero__slogan {
+  font-family: var(--sans);
+  font-style: normal;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: clamp(0.95rem, 2.4vw, 1.35rem);
+  color: var(--cream-muted);
+  display: inline-block;
+  position: relative;
+  margin: 0 0 2rem;
+}
+.page-menu .meal-hero__slogan::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -0.55rem;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: tracer 0.7s 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Meta: pill row instead of dot-separated line */
+.page-menu .meal-hero__meta {
+  gap: 0.6rem 0.7rem;
+}
+.page-menu .meal-hero__meta span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--cream-muted);
+  border: 1px solid var(--line);
+  background: rgba(245, 241, 232, 0.03);
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+}
+.page-menu .meal-hero__meta span:not(:last-child)::after { content: none; }
+
+/* Hero entrance (disabled under prefers-reduced-motion via global rule) */
+@keyframes heroRise {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes tracer { to { transform: scaleX(1); } }
+
+.page-menu .meal-hero__accent { animation: heroRise 0.6s ease both; }
+.page-menu .meal-hero__title  { animation: heroRise 0.7s 0.1s ease both; }
+.page-menu .meal-hero__slogan { animation: heroRise 0.7s 0.2s ease both; }
+.page-menu .meal-hero__meta   { animation: heroRise 0.7s 0.3s ease both; }
+
+/* ---------- LINEUP SECTION HEAD ---------- */
+.page-menu .menu-lineup-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: clamp(2.5rem, 6vw, 4rem);
+  border-top: 1px solid var(--line);
+}
+.page-menu .menu-lineup-head__title {
+  font-family: 'Anton', var(--sans);
+  font-weight: 400;
+  text-transform: uppercase;
+  font-size: clamp(1.7rem, 4.5vw, 2.8rem);
+  letter-spacing: 0.01em;
+  color: var(--cream);
+  margin: 0;
+  line-height: 1;
+}
+.page-menu .menu-lineup-head__note {
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin: 0;
+}
+/* The lineup head already provides top spacing, so trim the grid's */
+.page-menu .meal-layout { padding-top: clamp(1.5rem, 4vw, 2.5rem); }
+
+/* ---------- MEAL CARDS ---------- */
+.page-menu .meal-card { border-radius: 14px; }
+.page-menu .meal-card:hover { transform: translateY(-4px); }
+
+/* Gold accent bar slides across the card top on hover */
+.page-menu .meal-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+  z-index: 3;
+}
+.page-menu .meal-card:hover::before { transform: scaleX(1); }
+
+.page-menu .meal-card__tagline {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+/* Macro scoreboard */
+.page-menu .meal-card__macros {
+  background: var(--bg-deeper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.75rem 0.5rem;
+  gap: 0.4rem;
+}
+.page-menu .macro__value {
+  font-family: 'Anton', var(--sans);
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--cream);
+  letter-spacing: 0.01em;
+  margin-bottom: 0.35rem;
+}
+/* Protein is the hook — call it out in gold */
+.page-menu .meal-card__macros .macro:nth-child(2) .macro__value { color: var(--gold); }
+.page-menu .macro__label {
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+/* Price + add button */
+.page-menu .meal-card__price {
+  font-family: 'Anton', var(--sans);
+  font-weight: 400;
+  font-size: 1.65rem;
+  color: var(--cream);
+  letter-spacing: 0.01em;
+}
+.page-menu .meal-card__add-btn {
+  border-radius: 8px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  box-shadow: 0 4px 14px rgba(201, 169, 97, 0.22);
+}
+.page-menu .meal-card__add-btn:hover,
+.page-menu .meal-card__add-btn:focus-visible {
+  box-shadow: 0 6px 20px rgba(201, 169, 97, 0.4);
+}

@@ -9,15 +9,16 @@
   <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Great+Vibes&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/meal-prep.css" />
+  <link rel="stylesheet" href="css/menu-bold.css" />
 
   <!-- Supabase config (local dev: js/env.js; production: Netlify snippet) -->
   <script src="js/env.js"></script>
 </head>
-<body>
+<body class="page-menu">
   <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="nav" id="nav">
@@ -48,7 +49,7 @@
     <!-- Hero -->
     <section class="meal-hero" aria-labelledby="hero-title">
       <p class="meal-hero__accent">This Week's Menu</p>
-      <h1 id="hero-title" class="meal-hero__title">Fresh, Prepped, Fuelled</h1>
+      <h1 id="hero-title" class="meal-hero__title">Fresh, Prepped, <span class="hl">Fuelled</span></h1>
       <p class="meal-hero__slogan">Feed the Grind</p>
       <p class="meal-hero__meta">
         <span id="week-of">Week of 25 May</span>
@@ -66,6 +67,10 @@
 
     <!-- Main Layout -->
     <div class="container">
+      <div class="menu-lineup-head">
+        <h2 class="menu-lineup-head__title">The Lineup</h2>
+        <p class="menu-lineup-head__note">Fresh batch every week · macros on every meal</p>
+      </div>
       <div class="meal-layout">
         <!-- Sidebar Filters -->
         <aside class="meal-layout__sidebar">
