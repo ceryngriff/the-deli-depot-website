@@ -139,7 +139,8 @@ const MealBuilder = (() => {
    * Check if builder is complete
    */
   function isComplete() {
-    return state.protein && state.carb && state.veg.length === 2 && state.sauce;
+    // Veg is optional — customers can pick none, one, or up to two.
+    return state.protein && state.carb && state.sauce;
   }
 
   /**
@@ -151,10 +152,7 @@ const MealBuilder = (() => {
     const missing = [];
     if (!state.protein) missing.push('a protein');
     if (!state.carb) missing.push('a carb base');
-    if (state.veg.length < 2) {
-      const left = 2 - state.veg.length;
-      missing.push(`${left} more vegetable${left === 1 ? '' : 's'}`);
-    }
+    // Veg is optional, so it's never a blocker.
     if (!state.sauce) missing.push('a sauce');
     return missing;
   }
@@ -221,7 +219,7 @@ const MealBuilder = (() => {
         <label class="builder-option ${state.carb === carb.id ? 'is-selected' : ''}">
           <input type="radio" name="carb" value="${carb.id}" ${state.carb === carb.id ? 'checked' : ''} />
           <span class="builder-option__name">${escapeHtml(carb.name)}</span>
-          ${carb.priceModifier !== 0 ? `<span class="builder-option__price">${carb.priceModifier > 0 ? '+' : ''}£${Math.abs(carb.priceModifier).toFixed(2)}</span>` : ''}
+          ${carb.priceModifier !== 0 ? `<span class="builder-option__price">${carb.priceModifier > 0 ? '+' : '−'}£${Math.abs(carb.priceModifier).toFixed(2)}</span>` : ''}
           ${ketoBadge(carb)}
         </label>
       `).join('')}
@@ -241,7 +239,7 @@ const MealBuilder = (() => {
         <label class="builder-option ${state.veg.includes(veg.id) ? 'is-selected' : ''}">
           <input type="checkbox" name="veg" value="${veg.id}" ${state.veg.includes(veg.id) ? 'checked' : ''} />
           <span class="builder-option__name">${escapeHtml(veg.name)}</span>
-          <span class="builder-option__info">(Pick 2)</span>
+          <span class="builder-option__info">(Up to 2)</span>
           ${ketoBadge(veg)}
         </label>
       `).join('')}
