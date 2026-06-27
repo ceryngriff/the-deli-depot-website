@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Account | The Deli Depot</title>
-  <meta name="description" content="Manage your orders, subscriptions, and profile at The Deli Depot." />
+  <meta name="description" content="Manage your orders and profile at The Deli Depot." />
   <meta name="robots" content="noindex" />
 
   <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
@@ -61,10 +61,6 @@
                   aria-selected="true" aria-controls="panel-orders" id="tab-orders">
             My Orders
           </button>
-          <button class="account-tab" data-tab="subscriptions" role="tab"
-                  aria-selected="false" aria-controls="panel-subscriptions" id="tab-subscriptions">
-            Subscriptions
-          </button>
           <button class="account-tab" data-tab="profile" role="tab"
                   aria-selected="false" aria-controls="panel-profile" id="tab-profile">
             Profile
@@ -78,16 +74,6 @@
           <div id="orders-empty" class="orders-empty" hidden>
             <p>You haven't placed any orders yet.</p>
             <a class="btn" href="menu.html">Browse the Menu</a>
-          </div>
-        </div>
-
-        <!-- SUBSCRIPTIONS PANEL -->
-        <div class="account-panel" id="panel-subscriptions" data-panel="subscriptions"
-             role="tabpanel" aria-labelledby="tab-subscriptions" hidden>
-          <div id="subs-list"></div>
-          <div id="subs-empty" class="subs-empty" hidden>
-            <p>No active subscriptions. Save 10% with a weekly plan.</p>
-            <a class="btn" href="subscriptions.html">Browse Plans</a>
           </div>
         </div>
 

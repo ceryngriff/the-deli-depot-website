@@ -51,6 +51,22 @@
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
 
+# Subscriptions are temporarily disabled — send any visitor (bookmarks,
+# search results, old links) to the weekly menu instead. 302 (not 301) and
+# force = true so it overrides the still-present file and isn't permanently
+# cached, making it easy to re-enable later by removing this block.
+[[redirects]]
+  from = "/subscriptions"
+  to = "/menu.html"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/subscriptions.html"
+  to = "/menu.html"
+  status = 302
+  force = true
+
 # Clean /admin URL → admin index
 [[redirects]]
   from = "/admin"
