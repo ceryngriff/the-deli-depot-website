@@ -26,4 +26,4 @@ window.SUPABASE_CONFIG = {
 // The matching SECRET key lives only in Netlify env vars
 // (STRIPE_SECRET_KEY) and is never committed here.
 // =========================================================
-window.STRIPE_PUBLISHABLE_KEY = 'pk_test_51TgxQ4HWS4ZKdiZAlyzbwZXliVtReO8LVR9zzeiwVGUAiOInRGJTNKkAk84hiQiSEEbaUb5yLTUJDo9TF8WN4gz100xj9s7G3W';
+window.STRIPE_PUBLISHABLE_KEY = 'pk_live_51TgxPiHWuCBxPY85jVRsInobmBiVrDOcwRHGirUvPlcnaGgizEJ0S0K0PqumJvLnetFgk8x8XyVmHTxyBJB71a2W00TaM81Ue2';
