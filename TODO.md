@@ -73,6 +73,27 @@ activation; LIVE needs activation done.
 
 ---
 
+## 📱 Order-ready text messages (SMS) — NOT WIRED UP
+The admin order view has a **"Send Collection-Ready SMS"** button, but it's a
+placeholder: `sendSms()` in `js/admin-orders.js` only shows "SMS sending is not
+wired up yet" and logs to the console — no text is actually sent. Customers are
+not being texted when their order is ready.
+
+To make it work:
+- [ ] Pick an SMS provider (the code comment assumes **Twilio**; alternatives:
+      Vonage, MessageBird) and get account + a sender number/ID
+- [ ] Add a Netlify function (e.g. `netlify/functions/send-sms.js`) that takes an
+      order id, reads the phone + order number server-side from Supabase, and
+      sends the text via the provider API. Keep the provider auth token in a
+      Netlify env var (e.g. `TWILIO_AUTH_TOKEN`) — never in the website files.
+- [ ] Replace the placeholder in `sendSms()` so the button POSTs to that function
+      and shows a real success/failure toast.
+- [ ] Decide the message wording (e.g. "Hi {name}, your Deli Depot order
+      {order_number} is ready to collect from Unit 5, Pant Industrial Estate.").
+- [ ] Test with a real mobile, then confirm cost-per-text with the provider.
+
+---
+
 ## 🌿 Allergens — verify before relying on the labels
 Build Your Own currently declares "may contain ALL 14 allergens" as a safe
 blanket. After your stock purge + delivery, set the real per-ingredient
