@@ -33,6 +33,15 @@
   line-height: 1.1;
 }
 
+.meal-hero__slogan {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--gold);
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  letter-spacing: 0.04em;
+  margin: 0 0 1.5rem;
+}
+
 .meal-hero__meta {
   font-size: clamp(0.85rem, 2vw, 0.95rem);
   color: var(--cream-muted);
