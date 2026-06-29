@@ -438,12 +438,13 @@ async function saveChanges() {
   closeModal();
 }
 
-// ---------- SEND SMS (placeholder for Twilio) ----------
+// ---------- SEND COLLECTION-READY SMS ----------
+// Texts the customer their order is ready, via the send-sms Netlify Function.
+// The function re-reads the phone from the order server-side and requires a
+// valid admin session (we pass the admin's access token), so the browser is
+// never trusted with who can send a (paid-for) text.
 
-function sendSms() {
-  // TODO: Twilio integration — when wired up, this should POST to a
-  // serverless function (Netlify or Supabase Edge) that uses the
-  // Twilio API to text the customer's phone number.
+async function sendSms() {
   if (!viewing) return;
   if (!viewing.customer_phone) {
     toast('No phone number on this order.', 'error');
@@ -452,9 +453,33 @@ function sendSms() {
   if (viewing.status !== 'ready') {
     if (!confirm(`Order isn't marked "Ready" yet — send the SMS anyway?`)) return;
   }
-  toast('SMS sending is not wired up yet. Phone on order: ' + viewing.customer_phone, 'info', 6000);
-  // For now, log so we have something to test against later.
-  console.info('[admin-orders] would send SMS to', viewing.customer_phone, 'for', viewing.order_number);
+
+  const btn = document.getElementById('send-sms-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const accessToken = session?.access_token;
+    if (!accessToken) {
+      toast('Your admin session expired — please sign in again.', 'error');
+      return;
+    }
+
+    const resp = await fetch('/.netlify/functions/send-sms', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
+      body:    JSON.stringify({ orderId: viewing.id })
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (!resp.ok || !data.ok) throw new Error(data.error || `Failed (${resp.status})`);
+
+    toast(`Text sent to ${data.to}.`, 'success');
+  } catch (e) {
+    console.error('[admin-orders] send-sms', e);
+    toast(`Couldn't send the text: ${e.message}`, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Send Collection-Ready SMS'; }
+  }
 }
 
 // ---------- AUDIT LOG ----------
